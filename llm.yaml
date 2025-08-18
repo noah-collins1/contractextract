@@ -1,0 +1,8 @@
+﻿provider: ollama
+model_id: llama3:8b-instruct-q4_K_M
+model_url: http://localhost:11434
+
+defaults:
+  extraction_passes: 1
+  max_char_buffer: 900
+  max_workers: 1

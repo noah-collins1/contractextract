@@ -1,0 +1,18 @@
+# Core extraction engine
+langextract>=1.0.8
+
+# Config + validation
+PyYAML>=6.0
+pydantic>=2.6
+
+# PDF / OCR (for contracts in PDF form)
+pdfplumber>=0.11      # extract text from native PDFs
+pytesseract>=0.3.10   # OCR for scanned PDFs
+Pillow>=10.0          # required by pytesseract
+
+# Optional: for richer visualization or reports
+jinja2>=3.1
+
+#need ollama installed
+
+#python 3.11
