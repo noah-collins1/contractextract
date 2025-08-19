@@ -16,7 +16,7 @@ class LLMProvider(ABC):
     ) -> Any: ...
 
 class GeminiProvider(LLMProvider):
-    def __init__(self, model_id: str = "gemini-2.5-flash"):
+    def __init__(self, model_id: str = "gemini-1.5-flash"):
         self.model_id = model_id
 
     def extract(self, *, text_or_documents, prompt, examples,
@@ -29,8 +29,6 @@ class GeminiProvider(LLMProvider):
             extraction_passes=extraction_passes,
             max_workers=max_workers,
             max_char_buffer=max_char_buffer,
-            fence_output=True,
-            use_schema_constraints=True,
         )
 
 class OllamaProvider(LLMProvider):

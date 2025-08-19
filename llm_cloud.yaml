@@ -1,0 +1,8 @@
+provider: gemini
+model: gemini-1.5-flash  # or gemini-1.5-pro if you want higher quality
+
+
+defaults:
+  extraction_passes: 2
+  max_workers: 1
+  max_char_buffer: 10000
