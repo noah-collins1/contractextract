@@ -20,7 +20,7 @@ class GeminiProvider(LLMProvider):
         self.model_id = model_id
 
     def extract(self, *, text_or_documents, prompt, examples,
-                extraction_passes=1, max_workers=4, max_char_buffer=1000):
+                extraction_passes=1, max_workers=2, max_char_buffer=10000):
         return lx.extract(
             text_or_documents=text_or_documents,
             prompt_description=prompt,
@@ -36,7 +36,7 @@ class OllamaProvider(LLMProvider):
         self.model_id, self.url = model_id, url
 
     def extract(self, *, text_or_documents, prompt, examples,
-                extraction_passes=1, max_workers=2, max_char_buffer=800):
+                extraction_passes=1, max_workers=1, max_char_buffer=800):
         return lx.extract(
             text_or_documents=text_or_documents,
             prompt_description=prompt,

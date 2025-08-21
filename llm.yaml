@@ -4,5 +4,5 @@ model_url: http://localhost:11434
 
 defaults:
   extraction_passes: 1
-  max_char_buffer: 900
+  max_char_buffer: 800
   max_workers: 1
