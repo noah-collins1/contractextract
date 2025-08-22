@@ -1,0 +1,77 @@
+id: strategic_alliance_v1
+doc_type_names: ["Strategic Alliance Agreement", "Alliance Agreement"]
+
+jurisdiction_allowlist:
+  - US
+  - United States
+  - Canada
+  - EU
+  - European Union
+  - Australia
+  - AUS
+
+liability_cap:
+  max_cap_amount: 1000000.0
+  max_cap_multiplier: 1.0
+
+contract:
+  max_contract_value: 5000000.0
+
+fraud:
+  require_fraud_clause: true
+  require_liability_on_other_party: true
+
+prompt: |
+  Extract grounded facts from the contract text. Use exact spans (no paraphrasing).
+  Only return fields that are actually present; omit absent fields.
+
+  Classes:
+  - liability_cap(cap_text, cap_multiplier, cap_money.amount, cap_money.currency, carveouts[])
+  - contract_value(value_text, amount, currency)
+  - fraud_clause(fraud_text, liability_assignment)              # liability_assignment in {"other","self","unclear"}
+  - governing_law(law_text, country)                            # country or clearly named jurisdiction
+
+  Guidelines:
+  - liability_cap: If the cap references "12 months of fees" or similar, set cap_multiplier=1.0.
+  - contract_value: Extract the total/maximum contract value if explicitly stated (not every money mention).
+  - fraud_clause: Include any fraud carveout. If text assigns liability to the "other party", set liability_assignment="other"; 
+    if it assigns liability to the same party, use "self"; else "unclear".
+  - governing_law: Extract the governing law/jurisdiction/venue clause and identify the country/jurisdiction string.
+
+  Return ONLY a single JSON object with this shape (no extra text):
+
+  {
+    "extractions": [
+      {
+        "liability_cap": "<exact span or omit>",
+        "liability_cap_attributes": {
+          "cap_multiplier": <number or null>,
+          "cap_money.amount": <number or null>,
+          "cap_money.currency": "<ISO or symbol or null>",
+          "carveouts": ["<string>", "..."]
+        },
+        "contract_value": {
+          "value_text": "<exact span>",
+          "amount": <number or null>,
+          "currency": "<ISO or symbol or null>"
+        },
+        "fraud_clause": {
+          "fraud_text": "<exact span>",
+          "liability_assignment": "<other|self|unclear>"
+        },
+        "governing_law": {
+          "law_text": "<exact span>",
+          "country": "<string>"
+        }
+      }
+    ]
+  }
+
+examples:
+  - text: "Limitation of Liability: except for fraud, liability is capped at the fees paid in the twelve (12) months prior."
+    extractions:
+      - label: "liability_cap"
+        span: "liability is capped at the fees paid in the twelve (12) months prior"
+        attributes:
+          cap_multiplier: 1.0
+          carveouts: ["fraud"]
