@@ -5,20 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ed4ef082-8c23-4bc3-8a32-6ab63d9a8d52" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/evaluator.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/placeholder_rules_contracts.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/schemas.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/stash/ENERGOUSCORP_03_16_2017-EX-10.24-STRATEGIC ALLIANCE AGREEMENT.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/db.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rulepack_orm.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/langextract.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/langextract.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cloudtest.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloudtest.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/extract.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ingest.py" beforeDir="false" afterPath="$PROJECT_DIR$/ingest.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/llm.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/llm.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/llm_cloud.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/llm_cloud.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/llm_provider.py" beforeDir="false" afterPath="$PROJECT_DIR$/llm_provider.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline_map.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/doc_type.py" beforeDir="false" afterPath="$PROJECT_DIR$/doc_type.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rule_registry.py" beforeDir="false" afterPath="$PROJECT_DIR$/rule_registry.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/schemas.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,6 +27,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="HARD" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -60,6 +54,7 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "Python.api.executor": "Run",
     "Python.cloudtest.executor": "Run",
+    "Python.cloudtest2.executor": "Run",
     "Python.ingest.executor": "Run",
     "Python.llm_provider.executor": "Run",
     "Python.test.executor": "Run",
@@ -78,22 +73,22 @@
       <recent name="C:\Users\Owner\contractextract\data" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.cloudtest">
-    <configuration name="cloudtest" type="PythonConfigurationType" factoryName="Python">
+  <component name="RunManager" selected="Python.cloudtest2">
+    <configuration name="cloudtest2" type="PythonConfigurationType" factoryName="Python">
       <module name="langextract" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
-        <env name="GEMINI_API_KEY" value="none" />
+        <env name="GEMINI_API_KEY" value="AIzaSyDkqgp5M_hziIOuIOH-3z4z8lmiCl3CObk" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.11 (contractextract)" />
+      <option name="SDK_NAME" value="Python 3.12 (contractextract)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/cloudtest.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/cloudtest2.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -108,10 +103,10 @@
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
         <env name="PYTHONUTF8" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.11 (contractextract)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -126,7 +121,7 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.cloudtest" />
+      <item itemvalue="Python.cloudtest2" />
       <item itemvalue="Python.fix" />
     </list>
   </component>
@@ -148,12 +143,45 @@
     </task>
     <servers />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/test.py</url>
           <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/schemas.py</url>
+          <line>1</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/rule_registry.py</url>
+          <line>11</line>
+          <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -1,7 +1,8 @@
+
 # doc_type.py
 import re
 from typing import Optional
-from rule_registry import RulePack
+from schemas import RulePack
 
 def compile_title_hints(packs: dict[str, RulePack]) -> list[tuple[re.Pattern, str]]:
     hints: list[tuple[re.Pattern, str]] = []

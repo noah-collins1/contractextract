@@ -48,3 +48,21 @@ class DocumentReport(BaseModel):
     document_name: str
     passed_all: bool
     findings: List[Finding]
+
+# ---------- RulePack / Examples ----------
+class ExampleExtraction(BaseModel):
+    label: str
+    span: str
+    attributes: dict = Field(default_factory=dict)
+
+class ExampleItem(BaseModel):
+    text: str
+    extractions: List[ExampleExtraction] = Field(default_factory=list)
+
+class RulePack(BaseModel):
+    id: str
+    doc_type_names: List[str] = Field(default_factory=list)
+    rules: RuleSet = RuleSet()
+    prompt: str = ""
+    examples: List[ExampleItem] = Field(default_factory=list)
+
