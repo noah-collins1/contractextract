@@ -5,13 +5,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ed4ef082-8c23-4bc3-8a32-6ab63d9a8d52" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/db.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rulepack_orm.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bootstrap_db.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models_rulepack.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rulepack_dtos.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rulepack_loader.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rulepack_repo.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/telemetry.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/yaml_importer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/langextract.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/langextract.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/doc_type.py" beforeDir="false" afterPath="$PROJECT_DIR$/doc_type.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rule_registry.py" beforeDir="false" afterPath="$PROJECT_DIR$/rule_registry.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudtest.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive/cloudtest.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudtest2.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive/cloudtest2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluator.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/llm.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/llm.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/llm_cloud.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/archive/llm_cloud.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/llm_factory.py" beforeDir="false" afterPath="$PROJECT_DIR$/llm_factory.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/llm_provider.py" beforeDir="false" afterPath="$PROJECT_DIR$/llm_provider.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/placeholder_rules_contracts.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive/placeholder_rules_contracts.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prompt_autogen.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive/prompt_autogen.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements" beforeDir="false" afterPath="$PROJECT_DIR$/requirements" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rule_registry.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive/rule_registry.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rulepack_orm.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive/rulepack_orm.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test2.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive/test2.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,8 +55,8 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/noah-collins1/contractextract.git&quot;,
-    &quot;accountId&quot;: &quot;e09ce16e-8fe4-4f94-ae65-694036cc4dd3&quot;
+    &quot;url&quot;: &quot;https://github.com/noah-collins1/contractextact&quot;,
+    &quot;accountId&quot;: &quot;e711e762-1a69-43d4-b386-e800f8a708f4&quot;
   }
 }</component>
   <component name="ProjectColorInfo">{
@@ -49,54 +67,37 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python.api.executor": "Run",
-    "Python.cloudtest.executor": "Run",
-    "Python.cloudtest2.executor": "Run",
-    "Python.ingest.executor": "Run",
-    "Python.llm_provider.executor": "Run",
-    "Python.test.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/dev/contractextract/cloudtest.py",
-    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.api.executor&quot;: &quot;Run&quot;,
+    &quot;Python.bootstrap_db.executor&quot;: &quot;Run&quot;,
+    &quot;Python.cloudtest.executor&quot;: &quot;Run&quot;,
+    &quot;Python.cloudtest2.executor&quot;: &quot;Run&quot;,
+    &quot;Python.db.executor&quot;: &quot;Run&quot;,
+    &quot;Python.ingest.executor&quot;: &quot;Run&quot;,
+    &quot;Python.llm_provider.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/dev/contractextract/cloudtest.py&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\noahc\PycharmProjects\langextract\rules_packs" />
+      <recent name="C:\Users\noahc\PycharmProjects\langextract\stash" />
+      <recent name="C:\Users\noahc\PycharmProjects\langextract\archive" />
       <recent name="C:\dev\contractextract\stash" />
       <recent name="C:\Users\Owner\contractextract\data" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.cloudtest2">
-    <configuration name="cloudtest2" type="PythonConfigurationType" factoryName="Python">
-      <module name="langextract" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="GEMINI_API_KEY" value="AIzaSyDkqgp5M_hziIOuIOH-3z4z8lmiCl3CObk" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.12 (contractextract)" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/cloudtest2.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager">
     <configuration name="fix" type="PythonConfigurationType" factoryName="Python">
       <module name="langextract" />
       <option name="ENV_FILES" value="" />
@@ -107,11 +108,36 @@
         <env name="PYTHONUTF8" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.11 (langextract)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/cloudtest.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/archive/cloudtest.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python">
+      <module name="langextract" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUTF8" value="1" />
+        <env name="PYTHONIOENCODING" value="utf-8" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.11 (langextract)" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -121,14 +147,14 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.cloudtest2" />
+      <item itemvalue="Python.main" />
       <item itemvalue="Python.fix" />
     </list>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-495700d161d3-aa17d162503b-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-243.22562.220" />
+        <option value="bundled-python-sdk-53e2683a6804-9cdd278e9d02-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-251.26094.141" />
       </set>
     </attachedChunks>
   </component>
@@ -170,7 +196,7 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/test.py</url>
+          <url>file://$PROJECT_DIR$/archive/test.py</url>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -179,7 +205,7 @@
           <option name="timeStamp" value="2" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/rule_registry.py</url>
+          <url>file://$PROJECT_DIR$/archive/rule_registry.py</url>
           <line>11</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>

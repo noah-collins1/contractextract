@@ -1,28 +1,18 @@
-from __future__ import annotations
+# db.py
 import os
-from contextlib import contextmanager
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./contractextract.db")
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql+psycopg2://postgres:1219@localhost:5432/contractextract"
+)
 
-class Base(DeclarativeBase):
-    pass
+engine = create_engine(DATABASE_URL, future=True, pool_pre_ping=True)
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False, future=True)
+Base = declarative_base()
 
-_engine = create_engine(DATABASE_URL, echo=False, future=True)
-SessionLocal = sessionmaker(bind=_engine, autoflush=False, autocommit=False, expire_on_commit=False)
+def init_db():
+    from models_rulepack import RulePackRecord  # ensure model is imported
+    Base.metadata.create_all(bind=engine)
 
-@contextmanager
-def session_scope():
-    session = SessionLocal()
-    try:
-        yield session
-        session.commit()
-    except Exception:
-        session.rollback()
-        raise
-    finally:
-        session.close()
-
-def get_engine():
-    return _engine

@@ -11,32 +11,18 @@ class LLMProvider(ABC):
         prompt: str,
         examples: list[Any],
         extraction_passes: int = 1,
-        max_workers: int = 4,
-        max_char_buffer: int = 1000,
+        max_workers: int = 1,
+        max_char_buffer: int = 1500,
     ) -> Any: ...
 
-class GeminiProvider(LLMProvider):
-    def __init__(self, model_id: str = "gemini-1.5-flash"):
-        self.model_id = model_id
 
-    def extract(self, *, text_or_documents, prompt, examples,
-                extraction_passes=1, max_workers=2, max_char_buffer=10000):
-        return lx.extract(
-            text_or_documents=text_or_documents,
-            prompt_description=prompt,
-            examples=examples,
-            model_id=self.model_id,
-            extraction_passes=extraction_passes,
-            max_workers=max_workers,
-            max_char_buffer=max_char_buffer,
-        )
 
 class OllamaProvider(LLMProvider):
     def __init__(self, model_id="llama3:8b-instruct-q4_K_M", url="http://localhost:11434"):
         self.model_id, self.url = model_id, url
 
     def extract(self, *, text_or_documents, prompt, examples,
-                extraction_passes=1, max_workers=1, max_char_buffer=800):
+                extraction_passes=1, max_workers=1, max_char_buffer=1500):
         return lx.extract(
             text_or_documents=text_or_documents,
             prompt_description=prompt,

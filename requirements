@@ -1,18 +1,30 @@
-# Core extraction engine
+# ===== Core extraction engine =====
 langextract>=1.0.8
 
-# Config + validation
+# ===== Config + validation =====
 PyYAML>=6.0
-pydantic>=2.6
+pydantic>=1.10.15
 
-# PDF / OCR (for contracts in PDF form)
-pdfplumber>=0.11      # extract text from native PDFs
-pytesseract>=0.3.10   # OCR for scanned PDFs
-Pillow>=10.0          # required by pytesseract
+# ===== Database (Postgres) =====
+SQLAlchemy>=2.0
+psycopg2-binary>=2.9
 
-# Optional: for richer visualization or reports
+# ===== PDF / OCR (for contracts in PDF form) =====
+pdfplumber>=0.11       # extract text from native PDFs
+pytesseract>=0.3.10    # OCR for scanned PDFs
+Pillow>=10.0           # required by pytesseract
+
+# ===== Optional: visualization / templating for reports =====
 jinja2>=3.1
 
-#need ollama installed
+# ===== (Soon) API server =====
+# FastAPI/uvicorn are for the upcoming API layer; safe to install now.
+fastapi>=0.111
+uvicorn[standard]>=0.24
 
-#python 3.11
+# ===== Dev / testing (optional) =====
+# pytest>=7.4
+
+# ===== External runtimes (not pip-installed) =====
+# - Ollama must be installed separately and running locally.
+# - Python 3.11 recommended.

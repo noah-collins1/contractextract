@@ -1,8 +1,7 @@
 # evaluator.py  (patched)
 from pathlib import Path
-from typing import Dict, List
-from schemas import RuleSet, DocumentReport, Finding, Citation
-from placeholder_rules_contracts import evaluate_text_against_rules
+from schemas import RuleSet, DocumentReport, Finding
+from archive.placeholder_rules_contracts import evaluate_text_against_rules
 
 def make_report(document_name: str, text: str, rules: RuleSet) -> DocumentReport:
     findings, _guess = evaluate_text_against_rules(text, rules) or ([], None)

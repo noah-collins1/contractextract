@@ -1,13 +1,12 @@
 # cloudtest.py — cloud-backed runner with rule packs + doc-type detection
 from ingest import ingest
 from pathlib import Path
-import shutil, textwrap, os, re, hashlib, json, time, random, logging
+import shutil, os, re, hashlib, json, time, random, logging
 import langextract as lx
 from llm_factory import load_provider
 
-from schemas import RuleSet
 from evaluator import make_report, save_markdown, save_txt
-from rule_registry import load_rulepacks
+from archive.rule_registry import load_rulepacks
 from doc_type import guess_doc_type_id
 
 # ------------------------------
@@ -146,7 +145,7 @@ def main():
 
     texts = ingest()  # { name: text, ... }
 
-    outputs_dir = Path("outputs")
+    outputs_dir = Path("../outputs")
     outputs_dir.mkdir(parents=True, exist_ok=True)
 
     for name, text in texts.items():
