@@ -1,0 +1,67 @@
+id: promotion_v1
+doc_type_names:
+  - Promotion Agreement
+  - Marketing Promotion Agreement
+jurisdiction_allowlist:
+  - United States
+  - Canada
+  - European Union
+liability_cap:
+  max_cap_amount: null
+  max_cap_multiplier: null
+contract:
+  max_contract_value: null
+fraud:
+  require_fraud_clause: false
+  require_liability_on_other_party: false
+rules:
+  - id: performance_metrics_defined
+    type: promo.metrics
+    params:
+      require_defined_performance_metrics: true
+  - id: forbid_hidden_clawbacks
+    type: promo.clawback
+    params:
+      forbid_hidden_clawbacks: true
+  - id: auto_renewal_notice
+    type: promo.auto_renewal
+    params:
+      forbid_auto_renewal_without_notice: true
+  - id: termination_penalty_cap
+    type: promo.termination
+    params:
+      cap_early_termination_penalties: true
+  - id: exclusivity_scope_clear
+    type: promo.exclusivity
+    params:
+      clarify_exclusivity_scope: true
+prompt: |
+  You are analyzing a Promotion or Marketing Agreement.
+  Extract clauses related to:
+  - Defined performance metrics or sales targets.
+  - Clawback or repayment obligations.
+  - Automatic renewal conditions.
+  - Termination penalties.
+  - Exclusivity or territorial scope.
+  Label outputs with: performance_metric, clawback, auto_renewal, termination_penalty, exclusivity.
+examples:
+  - text: "Promoter shall achieve sales of at least 10,000 units per quarter."
+    extractions:
+      - label: performance_metric
+        span: "10,000 units per quarter"
+  - text: "In case of termination, Promoter must return all bonuses previously paid."
+    extractions:
+      - label: clawback
+        span: "return all bonuses previously paid"
+  - text: "This agreement automatically renews unless either party gives 90 days’ notice."
+    extractions:
+      - label: auto_renewal
+        span: "automatically renews unless either party gives 90 days’ notice"
+  - text: "If terminated early, Promoter owes a fee equal to one month of average commissions."
+    extractions:
+      - label: termination_penalty
+        span: "fee equal to one month of average commissions"
+  - text: "Promoter shall be exclusive within the Northeast territory."
+    extractions:
+      - label: exclusivity
+        span: "exclusive within the Northeast territory"

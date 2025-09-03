@@ -1,0 +1,55 @@
+id: noncompete_v1
+doc_type_names:
+  - Non-Compete Agreement
+  - Noncompetition Agreement
+  - Covenant Not to Compete
+jurisdiction_allowlist:
+  - United States
+  - Canada
+  - European Union
+liability_cap:
+  max_cap_amount: null
+  max_cap_multiplier: null
+contract:
+  max_contract_value: null
+fraud:
+  require_fraud_clause: false
+  require_liability_on_other_party: false
+# Optional structured rules for future typed evaluators
+rules:
+  - id: noncompete_max_duration
+    type: noncompete.duration
+    params:
+      max_years: 2
+  - id: noncompete_geo_scope
+    type: noncompete.geography
+    params:
+      allowed_scopes: ["city", "county", "statewide"]
+  - id: noncompete_industry_scope
+    type: noncompete.industry_scope
+    params:
+      forbid_all_industries: true
+prompt: |
+  You are analyzing a Non-Compete Agreement.
+  Extract clauses related to:
+  - Duration of the restriction (years or months).
+  - Geographic scope (region, state, nationwide).
+  - Scope of restricted industries or job functions.
+  Label outputs with: noncompete_duration, noncompete_scope, industry_scope.
+examples:
+  - text: "The Employee agrees not to compete with the Company for five (5) years anywhere in North America."
+    extractions:
+      - label: noncompete_duration
+        span: "five (5) years"
+        attributes: { years: 5 }
+      - label: noncompete_scope
+        span: "anywhere in North America"
+        attributes: { geography: "North America" }
+  - text: "Employee shall not engage in any business, regardless of industry, for a period of 24 months."
+    extractions:
+      - label: noncompete_duration
+        span: "24 months"
+        attributes: { years: 2 }
+      - label: industry_scope
+        span: "any business, regardless of industry"
+        attributes: { industry_scope: "all industries" }

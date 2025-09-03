@@ -1,0 +1,70 @@
+id: employment_v1
+doc_type_names:
+  - Employment Agreement
+  - Offer Letter
+  - Employment Contract
+jurisdiction_allowlist:
+  - United States
+  - Canada
+  - European Union
+liability_cap:
+  max_cap_amount: null
+  max_cap_multiplier: null
+contract:
+  max_contract_value: null
+fraud:
+  require_fraud_clause: false
+  require_liability_on_other_party: false
+rules:
+  - id: notice_period_required
+    type: emp.notice
+    params:
+      require_notice_period: true
+  - id: severance_terms_required
+    type: emp.severance
+    params:
+      require_severance_terms: true
+  - id: noncompete_scope_check
+    type: emp.noncompete
+    params:
+      check_noncompete_scope: true
+  - id: worker_classification_check
+    type: emp.classification
+    params:
+      detect_worker_misclassification: true
+  - id: wage_law_compliance
+    type: emp.wage
+    params:
+      ensure_wage_law_compliance: true
+prompt: |
+  You are analyzing an Employment Agreement.
+  Extract clauses related to:
+  - Termination notice period.
+  - Severance pay or benefits.
+  - Non-compete restrictions (duration, industry).
+  - Worker classification (employee vs contractor).
+  - Wage and hour compliance obligations.
+  Label outputs with: termination_notice, severance, noncompete_clause, worker_classification, wage_compliance.
+examples:
+  - text: "The Employee may be terminated with thirty (30) days’ notice."
+    extractions:
+      - label: termination_notice
+        span: "thirty (30) days’ notice"
+        attributes: { days: 30 }
+  - text: "Upon termination without cause, Employee shall receive six months of severance pay."
+    extractions:
+      - label: severance
+        span: "six months of severance pay"
+  - text: "The Employee agrees not to engage in similar employment within the software industry for two years."
+    extractions:
+      - label: noncompete_clause
+        span: "not to engage in similar employment within the software industry for two years"
+        attributes: { duration_years: 2, industry: "software" }
+  - text: "Contractor acknowledges they are an independent contractor and responsible for their own taxes."
+    extractions:
+      - label: worker_classification
+        span: "independent contractor and responsible for their own taxes"
+  - text: "Employer will comply with applicable wage and hour laws, including overtime requirements."
+    extractions:
+      - label: wage_compliance
+        span: "comply with applicable wage and hour laws, including overtime requirements"

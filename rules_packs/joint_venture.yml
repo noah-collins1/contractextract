@@ -1,0 +1,71 @@
+id: joint_venture_v1
+doc_type_names:
+  - Joint Venture Agreement
+  - JV Agreement
+jurisdiction_allowlist:
+  - United States
+  - Canada
+  - European Union
+liability_cap:
+  max_cap_amount: null
+  max_cap_multiplier: null
+contract:
+  max_contract_value: null
+fraud:
+  require_fraud_clause: false
+  require_liability_on_other_party: false
+rules:
+  - id: capital_contributions_defined
+    type: jv.capital_contributions
+    params:
+      require_defined_capital_contributions: true
+  - id: deadlock_resolution_required
+    type: jv.deadlock
+    params:
+      require_deadlock_resolution: true
+  - id: ip_ownership_clarity
+    type: jv.ip_ownership
+    params:
+      clarify_ip_ownership: true
+  - id: exit_strategy_required
+    type: jv.exit
+    params:
+      require_exit_strategy: true
+  - id: prohibit_unlimited_liability
+    type: jv.liability
+    params:
+      prohibit_unlimited_liability: true
+prompt: |
+  You are analyzing a Joint Venture Agreement.
+  Extract clauses related to:
+  - Capital contributions by each party.
+  - Deadlock resolution methods.
+  - Intellectual property ownership or licensing.
+  - Exit strategies or buyout provisions.
+  - Liability allocation or caps.
+  Label outputs with: capital_contribution, deadlock_resolution, ip_ownership, exit_strategy, liability_clause.
+examples:
+  - text: "Party A shall contribute $2 million, and Party B shall contribute equipment valued at $1.5 million."
+    extractions:
+      - label: capital_contribution
+        span: "$2 million"
+        attributes: { party: "Party A", amount: 2000000 }
+      - label: capital_contribution
+        span: "equipment valued at $1.5 million"
+        attributes: { party: "Party B", amount: 1500000 }
+  - text: "In case of deadlock, the matter shall be resolved by arbitration in New York."
+    extractions:
+      - label: deadlock_resolution
+        span: "resolved by arbitration"
+  - text: "All jointly developed IP shall be owned 50/50 by the Parties."
+    extractions:
+      - label: ip_ownership
+        span: "owned 50/50 by the Parties"
+  - text: "If either party wishes to exit, the other party has a right of first refusal."
+    extractions:
+      - label: exit_strategy
+        span: "right of first refusal"
+  - text: "Each Party’s liability shall be capped at the fees paid in the preceding twelve (12) months."
+    extractions:
+      - label: liability_clause
+        span: "capped at the fees paid in the preceding twelve (12) months"

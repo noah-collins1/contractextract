@@ -7,7 +7,7 @@ pydantic>=1.10.15
 
 # ===== Database (Postgres) =====
 SQLAlchemy>=2.0
-psycopg2-binary>=2.9
+psycopg2-binary>=2.9.9
 
 # ===== PDF / OCR (for contracts in PDF form) =====
 pdfplumber>=0.11       # extract text from native PDFs
@@ -17,8 +17,8 @@ Pillow>=10.0           # required by pytesseract
 # ===== Optional: visualization / templating for reports =====
 jinja2>=3.1
 
-# ===== (Soon) API server =====
-# FastAPI/uvicorn are for the upcoming API layer; safe to install now.
+# ===== API server =====
+
 fastapi>=0.111
 uvicorn[standard]>=0.24
 

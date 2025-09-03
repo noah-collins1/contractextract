@@ -9,6 +9,9 @@ import langextract as lx
 import pydantic
 from ingest import ingest
 from llm_factory import load_provider
+import os
+os.environ["ENABLE_LLM_EXPLANATIONS"] = "1"
+
 from evaluator import make_report, save_markdown, save_txt
 from doc_type import guess_doc_type_id
 
@@ -207,17 +210,22 @@ def print_doc_stats(tag: str, result):
 # ------------------------------
 # Simple sanity fallback (regex) if model returns nothing
 # ------------------------------
-TITLE_RE = re.compile(r"STRATEGIC ALLIANCE AGREEMENT", re.IGNORECASE)
-PARTY_RE = re.compile(r"(ChipMOS TECHNOLOGIES INC\.|Tsinghua Unigroup Ltd\.)", re.IGNORECASE)
+# old sanity check rules, specific to Strategic Alliance
+##TITLE_RE = re.compile(r"STRATEGIC ALLIANCE AGREEMENT", re.IGNORECASE)
+##PARTY_RE = re.compile(r"(ChipMOS TECHNOLOGIES INC\.|Tsinghua Unigroup Ltd\.)", re.IGNORECASE)
 
 def run_sanity_rules(text: str):
-    extractions = []
-    m = TITLE_RE.search(text)
-    if m:
-        extractions.append(lx.data.Extraction("agreement_title", m.group(0)))
-    for m in PARTY_RE.finditer(text):
-        extractions.append(lx.data.Extraction("party_names", m.group(1)))
-    return lx.data.AnnotatedDocument(text=text, extractions=extractions)
+    """
+    Minimal, pack-agnostic fallback: if the model returns nothing,
+    emit a couple of generic extractions so downstream artifacts aren’t empty.
+    """
+    import langextract as lx
+    lines = [ln.strip() for ln in (text or "").splitlines() if ln.strip()]
+    title_guess = (lines[0][:120] if lines else "Document")
+    ex = [
+        lx.data.Extraction("document_title_guess", title_guess),
+    ]
+    return lx.data.AnnotatedDocument(text=text, extractions=ex)
 
 # ------------------------------
 # Helpers for examples

@@ -4,32 +4,64 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ed4ef082-8c23-4bc3-8a32-6ab63d9a8d52" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/bootstrap_db.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models_rulepack.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rulepack_dtos.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rulepack_loader.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rulepack_repo.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/telemetry.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/yaml_importer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/langextract.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/langextract.iml" afterDir="false" />
+    <list default="true" id="ed4ef082-8c23-4bc3-8a32-6ab63d9a8d52" name="Changes" comment="refocused on main, local version">
+      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/AURASYSTEMSINC_06_16_2010-EX-10.25-STRATEGIC ALLIANCE AGREEMENT.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/front/.env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/front/public/favicon.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/front/src/App.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/front/src/api/client.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/front/src/api/types.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/front/src/components/FileRow.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/front/src/components/Navbar.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/front/src/components/ReportCard.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/front/src/components/RulePackEditor.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/front/src/main.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/front/src/pages/Dashboard.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/front/src/pages/Documents.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/front/src/pages/RulePacks.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/front/src/pages/Upload.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/front/src/theme.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rules_packs/employment.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rules_packs/ip_agreement.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rules_packs/joint_venture.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rules_packs/noncompete.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rules_packs/promotion.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rules_packs/servicing.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/ip_agreement/ArmstrongFlooringInc_20190107_8-K_EX-10.2_11471795_EX-10.2_Intellectual Property Agreement.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/ip_agreement/CerenceInc_20191002_8-K_EX-10.4_11827494_EX-10.4_Intellectual Property Agreement.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/ip_agreement/GarrettMotionInc_20181001_8-K_EX-2.4_11364532_EX-2.4_Intellectual Property Agreement.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/ip_agreement/PREMIERBIOMEDICALINC_05_14_2020-EX-10.2-INTELLECTUAL PROPERTY AGREEMENT.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/ip_agreement/RareElementResourcesLtd_20171019_SC 13D_EX-99.4_10897534_EX-99.4_Intellectual Property Agreement.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/joint_venture/ACCELERATEDTECHNOLOGIESHOLDINGCORP_04_24_2003-EX-10.13-JOINT VENTURE AGREEMENT.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/joint_venture/BORROWMONEYCOM,INC_06_11_2020-EX-10.1-JOINT VENTURE AGREEMENT.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/joint_venture/IMPCOTECHNOLOGIESINC_04_15_2003-EX-10.65-JOINT VENTURE AGREEMENT.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/joint_venture/KIROMICBIOPHARMA,INC_04_08_2020-EX-10.28-JOINT VENTURE AGREEMENT.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/joint_venture/NOVOINTEGRATEDSCIENCES,INC_12_23_2019-EX-10.1-JOINT VENTURE AGREEMENT.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/noncompete/Quaker Chemical Corporation - NON COMPETITION AND NON SOLICITATION AGREEMENT.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/noncompete/VIVINT SOLAR, INC. - NON-COMPETITION AGREEMENT.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/noncompete/WESTERN COPPER - NON-COMPETITION AGREEMENT.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/promotion/ASHWORTHINC_01_29_1999-EX-10.(D)-PROMOTION AGREEMENT AND NANTZ COMMUNICATIONS, INC..pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/promotion/DovaPharmaceuticalsInc_20181108_10-Q_EX-10.2_11414857_EX-10.2_Promotion Agreement.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/promotion/MIDDLEBROOKPHARMACEUTICALS,INC_03_18_2010-EX-10.1-PROMOTION AGREEMENT.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/promotion/VnueInc_20150914_8-K_EX-10.1_9259571_EX-10.1_Promotion Agreement.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/promotion/WHITESMOKE,INC_11_08_2011-EX-10.26-PROMOTION AND DISTRIBUTION AGREEMENT.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/servicing/ABILITYINC_06_15_2020-EX-4.25-SERVICES AGREEMENT.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/servicing/BICYCLETHERAPEUTICSPLC_03_10_2020-EX-10.11-SERVICE AGREEMENT.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/servicing/MERITLIFEINSURANCECO_06_19_2020-EX-10.(XIV)-MASTER SERVICES AGREEMENT.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/servicing/RISEEDUCATIONCAYMANLTD_04_17_2020-EX-4.23-SERVICE AGREEMENT.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/servicing/THERAVANCEBIOPHARMA,INC_05_08_2020-EX-10.2-SERVICE AGREEMENT.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/strategic_alliance/GOLDRESOURCECORP_12_11_2008-EX-10.1-STRATEGIC ALLIANCE AGREEMENT.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stash/strategic_alliance/IOVANCEBIOTHERAPEUTICS,INC_08_03_2017-EX-10.1-STRATEGIC ALLIANCE AGREEMENT.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cloudtest.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive/cloudtest.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cloudtest2.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive/cloudtest2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/CHIPMOSTECHNOLOGIESBERMUDALTD_04_18_2016-EX-4.72-Strategic Alliance Agreement.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/stash/strategic_alliance/CHIPMOSTECHNOLOGIESBERMUDALTD_04_18_2016-EX-4.72-Strategic Alliance Agreement.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/evaluator.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/llm.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/llm.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/llm_cloud.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/archive/llm_cloud.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/llm_factory.py" beforeDir="false" afterPath="$PROJECT_DIR$/llm_factory.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/llm_provider.py" beforeDir="false" afterPath="$PROJECT_DIR$/llm_provider.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ingest.py" beforeDir="false" afterPath="$PROJECT_DIR$/ingest.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/placeholder_rules_contracts.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive/placeholder_rules_contracts.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prompt_autogen.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive/prompt_autogen.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/requirements" beforeDir="false" afterPath="$PROJECT_DIR$/requirements" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rule_registry.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive/rule_registry.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rulepack_orm.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive/rulepack_orm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test2.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive/test2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stash/ENERGOUSCORP_03_16_2017-EX-10.24-STRATEGIC ALLIANCE AGREEMENT.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/stash/strategic_alliance/ENERGOUSCORP_03_16_2017-EX-10.24-STRATEGIC ALLIANCE AGREEMENT.pdf" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,6 +72,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Python Script" />
+        <option value="TypeScript File" />
+        <option value="TypeScript JSX File" />
       </list>
     </option>
   </component>
@@ -67,37 +101,59 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python.api.executor&quot;: &quot;Run&quot;,
-    &quot;Python.bootstrap_db.executor&quot;: &quot;Run&quot;,
-    &quot;Python.cloudtest.executor&quot;: &quot;Run&quot;,
-    &quot;Python.cloudtest2.executor&quot;: &quot;Run&quot;,
-    &quot;Python.db.executor&quot;: &quot;Run&quot;,
-    &quot;Python.ingest.executor&quot;: &quot;Run&quot;,
-    &quot;Python.llm_provider.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/dev/contractextract/cloudtest.py&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.api.executor": "Run",
+    "Python.bootstrap_db.executor": "Run",
+    "Python.cloudtest.executor": "Run",
+    "Python.cloudtest2.executor": "Run",
+    "Python.db.executor": "Run",
+    "Python.ingest.executor": "Run",
+    "Python.llm_provider.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.test.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "C:/Users/noahc/PycharmProjects/langextract",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "editor.preferences.tabs",
+    "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "C:\\Users\\noahc\\PycharmProjects\\langextract\\front\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "postgresql"
+    ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\noahc\PycharmProjects\langextract\rules_packs" />
+      <recent name="C:\Users\noahc\PycharmProjects\langextract" />
+      <recent name="C:\Users\noahc\PycharmProjects\langextract\stash\strategic_alliance" />
+      <recent name="C:\Users\noahc\PycharmProjects\langextract\stash\employment" />
+      <recent name="C:\Users\noahc\PycharmProjects\langextract\stash\servicing" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\noahc\PycharmProjects\langextract\data" />
+      <recent name="C:\Users\noahc\PycharmProjects\langextract\stash\strategic_alliance" />
       <recent name="C:\Users\noahc\PycharmProjects\langextract\rules_packs" />
       <recent name="C:\Users\noahc\PycharmProjects\langextract\stash" />
       <recent name="C:\Users\noahc\PycharmProjects\langextract\archive" />
-      <recent name="C:\dev\contractextract\stash" />
-      <recent name="C:\Users\Owner\contractextract\data" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.main">
     <configuration name="fix" type="PythonConfigurationType" factoryName="Python">
       <module name="langextract" />
       <option name="ENV_FILES" value="" />
@@ -113,6 +169,7 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/archive/cloudtest.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -128,8 +185,10 @@
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
         <env name="PYTHONUTF8" value="1" />
         <env name="PYTHONIOENCODING" value="utf-8" />
+        <env name="ENABLE_LLM_EXPLANATIONS" value="1 " />
       </envs>
       <option name="SDK_HOME" value="" />
       <option name="SDK_NAME" value="Python 3.11 (langextract)" />
@@ -137,6 +196,7 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -147,14 +207,15 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.main" />
       <item itemvalue="Python.fix" />
+      <item itemvalue="Python.main" />
     </list>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-53e2683a6804-9cdd278e9d02-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-251.26094.141" />
+        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-PY-252.25557.130" />
+        <option value="bundled-python-sdk-1bde30d8e611-7b97d883f26b-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.25557.130" />
       </set>
     </attachedChunks>
   </component>
@@ -166,8 +227,25 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1755374740001</updated>
+      <workItem from="1756743224594" duration="127000" />
+      <workItem from="1756743363397" duration="43172000" />
+      <workItem from="1756920268160" duration="1789000" />
+      <workItem from="1756922082494" duration="1942000" />
+      <workItem from="1756924061164" duration="3156000" />
     </task>
+    <task id="LOCAL-00001" summary="refocused on main, local version">
+      <option name="closed" value="true" />
+      <created>1756672502494</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1756672502494</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -192,6 +270,10 @@
       </map>
     </option>
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="refocused on main, local version" />
+    <option name="LAST_COMMIT_MESSAGE" value="refocused on main, local version" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -211,5 +293,9 @@
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/langextract$main.coverage" NAME="main Coverage Results" MODIFIED="1756920324419" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/langextract$bootstrap_db.coverage" NAME="bootstrap_db Coverage Results" MODIFIED="1756873387909" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

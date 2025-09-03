@@ -1,0 +1,65 @@
+id: ip_agreement_v1
+doc_type_names:
+  - Intellectual Property Agreement
+  - IP Assignment
+  - Proprietary Rights Agreement
+jurisdiction_allowlist:
+  - United States
+  - Canada
+  - European Union
+liability_cap:
+  max_cap_amount: null
+  max_cap_multiplier: null
+contract:
+  max_contract_value: null
+fraud:
+  require_fraud_clause: false
+  require_liability_on_other_party: false
+rules:
+  - id: ip_assignment_clarity
+    type: ip.assignment
+    params:
+      require_assignment_clarity: true
+  - id: moral_rights_waiver
+    type: ip.moral_rights
+    params:
+      require_waiver: true
+  - id: license_back_allowed
+    type: ip.license_back
+    params:
+      allow_license_back: true
+  - id: forbid_overbroad_assignment
+    type: ip.overbreadth
+    params:
+      forbid_overbroad_assignment: true
+  - id: confidentiality_linked_to_ip
+    type: ip.confidentiality
+    params:
+      require_confidentiality_linked_to_ip: true
+prompt: |
+  You are analyzing an Intellectual Property Assignment Agreement.
+  Extract clauses related to:
+  - Assignment of inventions, works, or IP.
+  - Waiver of moral rights.
+  - License-back provisions to the assignor.
+  - Confidentiality terms tied to IP.
+  Label outputs with: ip_assignment, moral_rights_waiver, license_back, ip_confidentiality.
+examples:
+  - text: "All inventions created by Contractor shall be assigned exclusively to the Company."
+    extractions:
+      - label: ip_assignment
+        span: "assigned exclusively to the Company"
+        attributes: { assignee: "Company" }
+  - text: "The Contractor hereby waives all moral rights to the Work."
+    extractions:
+      - label: moral_rights_waiver
+        span: "waives all moral rights"
+  - text: "Company grants Contractor a license-back to use the IP for internal purposes."
+    extractions:
+      - label: license_back
+        span: "license-back to use the IP"
+        attributes: { scope: "internal purposes" }
+  - text: "Recipient shall keep all disclosed trade secrets confidential for a period of five (5) years."
+    extractions:
+      - label: ip_confidentiality
+        span: "keep all disclosed trade secrets confidential for a period of five (5) years"
