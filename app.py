@@ -496,3 +496,8 @@ def list_pack_versions(pack_id: str, db: Session = Depends(get_db)):
         for r in rows
     ]
 
+
+# Import MCP server to mount at /mcp - this must run for /mcp endpoint to exist
+# import mcp_server.server  # FastMCP approach - commented out due to mounting issues
+import mcp_server.alternative_server  # Direct FastAPI approach
+
