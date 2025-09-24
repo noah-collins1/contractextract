@@ -1,0 +1,75 @@
+# ContractExtract requirements for .venv-v2 (FastAPI + MCP + Pydantic v2)
+# This environment runs the main FastAPI server with MCP integration
+
+# Core FastAPI and ASGI server
+fastapi==0.103.*
+uvicorn[standard]==0.30.*
+starlette>=0.27.0
+
+# Pydantic v2 for data validation
+pydantic>=2.0.0,<3.0.0
+pydantic-settings>=2.0.0
+
+# Database and ORM
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.0
+alembic>=1.12.0
+
+# MCP (Model Context Protocol) integration
+mcp[cli]>=0.1.0
+
+# HTTP client for bridge communication
+requests>=2.31.0
+httpx>=0.25.0
+
+# PDF processing and document ingestion
+pdfplumber>=0.10.0
+pypdf>=3.0.0
+
+# YAML processing for rule packs
+pyyaml>=6.0.1
+ruamel.yaml>=0.17.0
+
+# Date/time handling
+python-dateutil>=2.8.2
+
+# Logging and monitoring
+structlog>=23.0.0
+colorama>=0.4.6
+
+# Configuration management
+python-dotenv>=1.0.0
+
+# Testing and development (optional but recommended)
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+httpx>=0.25.0  # For testing FastAPI endpoints
+
+# Type checking and code quality
+mypy>=1.5.0
+black>=23.7.0
+isort>=5.12.0
+flake8>=6.0.0
+
+# Security and utilities
+cryptography>=41.0.0
+python-multipart>=0.0.6  # For file uploads
+python-jose[cryptography]>=3.3.0  # For JWT handling (optional)
+
+# Optional: Enhanced JSON handling
+orjson>=3.9.0
+
+# Optional: Advanced logging
+rich>=13.5.0
+
+# Optional: Performance monitoring
+prometheus-client>=0.17.0
+
+# Optional: Enhanced validation
+email-validator>=2.0.0
+phonenumbers>=8.13.0
+
+# Documentation generation
+# mkdocs>=1.5.0
+# mkdocs-material>=9.2.0

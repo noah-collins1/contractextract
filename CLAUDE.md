@@ -373,3 +373,12 @@ mcpServers:
 ---
 
 **Owner's note**: Keep this file (`claude.md`) as the single source of truth for MCP + env setup. Use the prompts above in Claude Code to generate and evolve files safely.
+
+## MCP Smoke Test (Windows)
+
+1) Start FastAPI+MCP (venv-2):
+```powershell
+.\.venv-v2\Scripts\Activate.ps1
+set USE_V1_BRIDGE=0
+uvicorn app:app --host 127.0.0.1 --port 8000 --reload
+```

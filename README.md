@@ -1,182 +1,419 @@
-# LangExtract Contract Evaluator
+# ContractExtract - AI-Powered Contract Analysis with LibreChat MCP Integration
 
-A **FastAPI-based contract analysis service** with a companion **React frontend**.  
-The system ingests PDFs, runs them through a configurable rule-based pipeline, and outputs **compliance reports** in Markdown and JSON.  
+A **FastAPI-based contract analysis service** with **React frontend** and **comprehensive LibreChat MCP (Model Context Protocol) integration**.
 
-Rules are stored as **versioned YAML “rule packs”** in Postgres, so behavior is fully data-driven. Optional LLM rationales can enrich findings.
+The system ingests PDFs, runs them through configurable rule-based compliance pipelines, and outputs detailed **compliance reports** in Markdown and JSON. Rules are stored as **versioned YAML "rule packs"** in PostgreSQL, enabling fully data-driven behavior with optional LLM rationales.
+
+🔥 **NEW**: Complete LibreChat integration with **16 MCP tools** allowing LLMs to create, edit, and manage rule packs while analyzing contracts in real-time!
 
 ---
 
-## ✨ Features
+## ✨ Key Features
 
-- **PDF ingestion** via [pdfplumber](https://github.com/jsvine/pdfplumber).
-- **Document type detection** (regex vs. `doc_type_names` from rule packs).
-- **Rule packs in Postgres**: draft → active → deprecated lifecycle.
-- **Evaluation pipeline**:
-  - Liability caps
+### Core Contract Analysis
+- **PDF ingestion** via [pdfplumber](https://github.com/jsvine/pdfplumber)
+- **Document type detection** (regex matching against `doc_type_names`)
+- **Rule-based evaluation pipeline**:
+  - Liability caps and limits
   - Contract value thresholds
-  - Fraud clauses
-  - Jurisdiction allowlist
-  - Extensible via YAML rules
-- **Outputs**: structured JSON + Markdown reports.
-- **LLM rationales (optional)**.
-- **REST API** with Swagger UI (`/docs`).
-- **Batch runner** (`main.py`) for testing against local `data/*.pdf`.
-- **Frontend UI** for managing rule packs and uploading PDFs.
+  - Fraud clause detection
+  - Jurisdiction allowlist compliance
+  - Extensible via YAML configuration
+- **Structured outputs**: JSON reports + Markdown summaries
+- **Optional LLM rationales** for failed findings
+
+### LibreChat MCP Integration (NEW!)
+- **16 comprehensive MCP tools** for complete rule pack lifecycle management
+- **Real-time rule pack creation/editing** via natural language
+- **Document analysis directly in LibreChat** conversations
+- **YAML template generation** for new rule packs
+- **Validation and preview** capabilities
+- **Dual environment support** (Pydantic v1/v2 compatibility)
+
+### Database & API
+- **Versioned rule packs**: draft → active → deprecated lifecycle
+- **PostgreSQL storage** with full CRUD operations
+- **REST API** with comprehensive Swagger UI (`/docs`)
+- **Batch processing** for local PDF testing
+- **React frontend** for rule pack management
 
 ---
 
-## 📂 Project Structure
+## 🏗 Architecture Overview
+
+### System Components
 
 ```
-backend/
-  app.py               # FastAPI app entrypoint
-  db.py                # Database engine/session
-  bootstrap_db.py      # Seeder: load YAML packs into DB
-  models_rulepack.py   # SQLAlchemy model (rule_packs table)
-  rulepack_dtos.py     # Pydantic schemas for rule packs
-  rulepack_loader.py   # Service to load packs for runtime
-  yaml_importer.py     # Import YAML → DB rows
-  evaluator.py         # Core evaluator + Markdown writers
-  ingest.py            # PDF ingestion utilities
-  doc_type.py          # Document type guessing
-  telemetry.py         # Simple logging / telemetry hooks
-  main.py              # Batch runner (local dev tool)
-  schemas.py           # Core Pydantic models
+LibreChat (Docker)
+    ↓ MCP Protocol (JSON-RPC)
+ContractExtract FastAPI (.venv-v2, Pydantic v2)
+    ↓ Database Queries
+PostgreSQL (rule_packs table)
+    ↓ Optional Bridge (HTTP)
+LangExtract v1 Service (.venv-v1, Pydantic v1) [Optional]
+```
 
-frontend/
-  .env                 # Frontend environment variables (VITE_API_BASE_URL)
-  package.json         # Frontend dependencies & scripts
-  vite.config.ts       # Vite config (React + SWC)
-  tsconfig.json        # TypeScript configuration
-  index.html           # Entry HTML
-  public/              # Static assets
-  src/
-    api/               # Axios client + DTOs
-    components/        # Navbar, FileRow, ReportCard, RulePackEditor
-    pages/             # Dashboard, Upload, Documents, RulePacks
-    App.tsx            # Router & layout
-    main.tsx           # React entrypoint
-    theme.css          # Global theme (navy blue / Volaris styling)
+### Directory Structure
+
+```
+contractextract/
+├── README.md                    # This file
+├── CLAUDE.md                    # Claude Code development guide
+├── requirements-v1.txt          # Pydantic v1 environment dependencies
+├── requirements-v2.txt          # Pydantic v2 environment dependencies
+│
+├── librechat/                   # 📁 LibreChat integration files
+│   ├── librechat.yaml           # MCP server configuration
+│   ├── docker-compose.override.yml # Docker networking setup
+│   └── README.md                # Integration instructions
+│
+├── app.py                       # 🚀 Main FastAPI application
+├── db.py                        # Database engine and session management
+├── bootstrap_db.py              # Database seeder (loads initial rule packs)
+├── models_rulepack.py           # SQLAlchemy model (rule_packs table)
+├── rulepack_*.py                # Rule pack management (repo, loader, DTOs)
+├── yaml_importer.py             # YAML → Database import logic
+├── evaluator.py                 # Core contract evaluation engine
+├── ingest.py                    # PDF text extraction utilities
+├── doc_type.py                  # Document type detection
+├── schemas.py                   # Core Pydantic models
+├── main.py                      # Batch runner for local testing
+│
+├── mcp_server/                  # 🔌 MCP Integration
+│   ├── __init__.py
+│   ├── direct_mcp_endpoint.py   # JSON-RPC MCP protocol implementation
+│   ├── tools.py                 # 16 MCP tool functions
+│   ├── server.py                # [OBSOLETE] FastMCP mounting approach
+│   └── alternative_server.py    # [OBSOLETE] Alternative implementation
+│
+├── bridge_client.py             # HTTP client for v1 LangExtract bridge
+├── langextract_service.py       # [OPTIONAL] v1 compatibility service
+│
+├── front/                       # 🎨 React Frontend
+│   ├── package.json             # Frontend dependencies
+│   ├── vite.config.ts           # Vite bundler configuration
+│   ├── src/                     # React components and pages
+│   └── public/                  # Static assets
+│
+├── data/                        # 📄 Test PDFs for batch processing
+├── outputs/                     # 📊 Generated reports and analysis results
+├── rules_packs/                 # 📋 YAML rule pack definitions
+└── archive/                     # 🗂 Legacy evaluation code
 ```
 
 ---
 
-## 🗄 Database Setup (Postgres)
+## 🗄 Database Schema
 
-The backend connects to Postgres using the `DATABASE_URL` environment variable.  
-Default (from `db.py` and `bootstrap_db.py`):
-
-```
-postgresql+psycopg2://postgres:1219@localhost:5432/contractextract
-```
-
-### Create Database
-```bash
-# Log into Postgres (adjust username/password if needed)
-psql -U postgres
-
-# Inside psql:
-CREATE DATABASE contractextract;
-```
-
-### Rule Pack Table Schema
-
-**Table: `rule_packs`**
+**Table: `rule_packs`** (PostgreSQL)
 
 | Column                   | Type        | Description                                   |
 |---------------------------|-------------|-----------------------------------------------|
-| `id`                     | text        | Stable identifier (e.g., `strategic_alliance`) |
+| `id`                     | text        | Stable identifier (e.g. `strategic_alliance`) |
 | `version`                | int         | Version number (composite PK with `id`)       |
 | `status`                 | enum        | `draft` \| `active` \| `deprecated`         |
-| `schema_version`         | text        | Rulepack schema version (default: `"1.0"`)    |
-| `doc_type_names`         | jsonb       | List of names/aliases for type detection      |
-| `ruleset_json`           | jsonb       | Parsed `RuleSet` (jurisdiction, liability, etc.) |
+| `schema_version`         | text        | Rule pack schema version (default: `"1.0"`)   |
+| `doc_type_names`         | jsonb       | Document type names for auto-detection        |
+| `ruleset_json`           | jsonb       | Structured rules (jurisdiction, liability, etc.) |
 | `rules_json`             | jsonb       | Extended rules (optional, extensible)         |
-| `llm_prompt`             | text        | Seed prompt for LLM rationale (optional)      |
-| `llm_examples_json`      | jsonb       | Examples for LLM extraction (optional)        |
-| `extensions_json`        | jsonb       | Optional extensions                           |
-| `extensions_schema_json` | jsonb       | Schema for extensions                         |
-| `raw_yaml`               | text        | Original YAML (round-trippable)               |
-| `notes`                  | text        | Human notes                                   |
-| `created_by`             | text        | Author / importer                             |
-| `created_at`             | timestamptz | Auto-set                                      |
-| `updated_at`             | timestamptz | Auto-set on update                            |
+| `llm_prompt`             | text        | LLM prompt for rationale generation           |
+| `llm_examples_json`      | jsonb       | Examples for LLM few-shot learning           |
+| `extensions_json`        | jsonb       | Custom extensions (optional)                  |
+| `extensions_schema_json` | jsonb       | Extensions validation schema                  |
+| `raw_yaml`               | text        | Original YAML for round-trip editing         |
+| `notes`                  | text        | Human-readable notes                          |
+| `created_by`             | text        | Author/creator identifier                     |
+| `created_at`             | timestamptz | Creation timestamp                            |
+| `updated_at`             | timestamptz | Last modification timestamp                   |
 
 ---
 
-## ⚙️ API Overview
+## 🔌 LibreChat MCP Tools (16 Available)
 
-Once the server is running, docs are at <http://localhost:8000/docs>.
+### Rule Pack Management
+- **`list_all_rulepacks`** - List ALL rule packs (any status/version)
+- **`list_active_rulepacks`** - List only active rule packs for runtime
+- **`get_rulepack_details`** - Get detailed rule pack information
+- **`get_rulepack_yaml`** - Retrieve raw YAML content
+- **`list_rulepack_versions`** - List all versions for a rule pack ID
 
-### Rule Pack Endpoints
-- `GET /rule-packs/all` → list all packs
-- `GET /rule-packs/{id}` → list versions
-- `GET /rule-packs/{id}/{version}` → details
-- `GET /rule-packs/{id}/{version}/yaml` → download original YAML
-- `POST /rule-packs/import-yaml` → import YAML as draft (paste text)
-- `POST /rule-packs/upload-yaml` → import YAML as draft (file)
-- `POST /rule-packs/{id}/{version}:publish` → publish a draft
-- `POST /rule-packs/{id}/{version}:deprecate` → deprecate
-- `PUT /rule-packs/{id}/{version}` → edit draft (JSON patch or YAML)
-- `DELETE /rule-packs/{id}/{version}` → delete draft (`?force=true` to override)
+### Rule Pack Creation & Editing (LLM-Powered!)
+- **`create_rulepack_from_yaml`** - Create new rule packs from YAML
+- **`update_rulepack_yaml`** - Edit draft rule packs
+- **`publish_rulepack`** - Publish drafts to make them active
+- **`deprecate_rulepack`** - Deprecate active rule packs
+- **`delete_rulepack`** - Delete rule packs (with safety controls)
 
-### Evaluation Endpoints
-- `POST /preview-run` → Upload a PDF → detect type → evaluate → return Markdown report.
+### Document Analysis
+- **`analyze_document`** - Comprehensive document analysis with citations
+- **`preview_document_analysis`** - Quick preview without saving files
 
----
+### Utilities & Development
+- **`generate_rulepack_template`** - Generate YAML templates for new packs
+- **`validate_rulepack_yaml`** - Validate YAML before creating/updating
+- **`get_system_info`** - System status and monitoring information
 
-## 🚀 Getting Started
-
-### Backend
-1. Ensure Postgres is running and `DATABASE_URL` is set.
-2. Install dependencies:
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate   # or .venv\Scripts\activate on Windows
-   pip install -r requirements.txt
-   ```
-3. Seed rule packs:
-   ```bash
-   python bootstrap_db.py
-   ```
-4. Run API:
-   ```bash
-   uvicorn app:app --reload --port 8000
-   ```
-
-### Frontend
-1. Navigate into the frontend directory:
-   ```bash
-   cd frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the dev server:
-   ```bash
-   npm run dev
-   ```
-   App runs at <http://localhost:5173>
+### Legacy Compatibility
+- **`list_rulepacks`**, **`get_rulepack`**, **`analyze`** - Backward compatibility
 
 ---
 
-## 📌 Roadmap
+## 🚀 LibreChat Startup Instructions
 
-- [ ] Refactor backend into clean layered structure  
-- [ ] Extend React frontend with filtering and job tracking  
-- [ ] Add Alembic migrations  
-- [ ] Add “compare versions” view for packs  
-- [ ] Extend evaluator with plugin system (`eval_<type>.py`)  
-- [ ] LLM prompt generation for new packs  
-- [ ] Fine-tune AdaptLLM-Legal on MAUD dataset  
-- [ ] RAG support for policy references  
-- [ ] Chatbot rulepack assistant  
+### Prerequisites (One-Time Setup)
+
+1. **Install Python 3.11**
+2. **Install PostgreSQL** and create `contractextract` database:
+   ```sql
+   CREATE DATABASE contractextract;
+   ```
+3. **Install LibreChat** (follow their documentation)
+4. **Clone this repository**
+
+### Step 1: Create Virtual Environments
+
+```powershell
+# Navigate to project directory
+cd C:\path\to\contractextract
+
+# Create Pydantic v2 environment (FastAPI + MCP)
+python -m venv .venv-v2
+.\.venv-v2\Scripts\Activate.ps1
+pip install -r requirements-v2.txt
+
+# Create Pydantic v1 environment (optional, for LangExtract bridge)
+python -m venv .venv-v1
+.\.venv-v1\Scripts\Activate.ps1
+pip install -r requirements-v1.txt
+```
+
+### Step 2: Configure LibreChat
+
+Copy configuration files from the `librechat/` folder to your LibreChat installation:
+
+```powershell
+# Copy LibreChat configuration files
+copy librechat\librechat.yaml C:\path\to\your\LibreChat\
+copy librechat\docker-compose.override.yml C:\path\to\your\LibreChat\
+```
+
+### Step 3: Initialize Database
+
+```powershell
+# Activate v2 environment
+.\.venv-v2\Scripts\Activate.ps1
+
+# Seed database with initial rule packs
+python bootstrap_db.py
+```
+
+### Step 4: Start ContractExtract Server
+
+```powershell
+# Ensure v2 environment is active
+.\.venv-v2\Scripts\Activate.ps1
+
+# Start FastAPI server with MCP integration
+uvicorn app:app --host 127.0.0.1 --port 8000 --reload
+```
+
+**✅ Verify:**
+- Server logs show: `"All MCP tools registered successfully - 16 total tools"`
+- FastAPI docs accessible: http://127.0.0.1:8000/docs
+- MCP endpoint responds: `curl -X POST http://localhost:8000/mcp -H "Content-Type: application/json" -d '{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}'`
+
+### Step 5: Start LibreChat
+
+```powershell
+# Navigate to LibreChat directory
+cd C:\path\to\your\LibreChat
+
+# Start LibreChat with Docker Compose
+docker-compose up -d
+```
+
+**✅ Verify:**
+- LibreChat accessible: http://localhost:3080
+- No MCP initialization errors in logs
+- ContractExtract tools appear in chat interface
+
+### Step 6: Test MCP Integration
+
+In LibreChat chat interface:
+
+1. **Test Connection:** `Get system information about ContractExtract`
+2. **List Rule Packs:** `Show me all available rule packs`
+3. **Analyze Contract:** `Analyze this contract text: "Service Agreement between Company A and B, value $50,000, governed by California law"`
+4. **Create Rule Pack:** `Generate a template for a new 'vendor_agreement' rule pack`
+
+---
+
+## 🛠 Development Commands
+
+### FastAPI Server (Pydantic v2)
+```powershell
+.\.venv-v2\Scripts\Activate.ps1
+uvicorn app:app --reload --port 8000
+```
+
+### Optional LangExtract Bridge (Pydantic v1)
+```powershell
+.\.venv-v1\Scripts\Activate.ps1
+uvicorn langextract_service:app --port 8091 --reload
+```
+
+### React Frontend
+```powershell
+cd front
+npm install
+npm run dev  # http://localhost:5173
+```
+
+### Batch Processing
+```powershell
+.\.venv-v2\Scripts\Activate.ps1
+python main.py  # Processes PDFs in data/ folder
+```
+
+---
+
+## 🔧 Configuration Files
+
+### Environment Variables
+
+**Required:**
+- `DATABASE_URL` - PostgreSQL connection string (default: `postgresql+psycopg2://postgres:1219@localhost:5432/contractextract`)
+
+**Optional:**
+- `USE_V1_BRIDGE=1` - Enable LangExtract v1 bridge integration
+- `ENABLE_LLM_EXPLANATIONS=1` - Enable LLM rationales for failed findings
+- `LLM_PROVIDER` - LLM provider configuration (default: "ollama")
+- `CE_MAX_WORKERS` - Document-level parallelism (default: 1)
+- `CE_CHUNK_TARGET` - Target chunk size in characters (default: 9000)
+
+### LibreChat Integration
+
+The `librechat/` folder contains:
+
+- **`librechat.yaml`** - Complete MCP server configuration
+- **`docker-compose.override.yml`** - Docker networking setup for host connectivity
+- **`README.md`** - Detailed integration instructions
+
+---
+
+## 🆘 Troubleshooting
+
+### "MCP server failed to initialize"
+1. Verify FastAPI server running on port 8000
+2. Check LibreChat uses correct URL (`localhost` vs `host.docker.internal`)
+3. Confirm MCP tools registered in server logs
+4. Increase `initTimeout` in librechat.yaml
+
+### "Port already in use"
+```powershell
+# Kill existing processes
+Get-Process | Where-Object {$_.ProcessName -like "*python*"} | Stop-Process -Force
+# Or change ports and update configuration
+```
+
+### "Database connection failed"
+1. Start PostgreSQL service
+2. Verify `contractextract` database exists
+3. Check `DATABASE_URL` environment variable
+
+### "Import errors"
+1. Ensure correct virtual environment activated
+2. Verify requirements installed: `pip list`
+3. Check Python version: `python --version` (should be 3.11)
+
+---
+
+## 📊 API Endpoints
+
+### Rule Pack Management
+- `GET /rule-packs/all` - List all rule packs
+- `GET /rule-packs/{id}` - List versions for rule pack
+- `GET /rule-packs/{id}/{version}` - Get rule pack details
+- `GET /rule-packs/{id}/{version}/yaml` - Download YAML
+- `POST /rule-packs/import-yaml` - Import YAML as draft
+- `POST /rule-packs/upload-yaml` - Upload YAML file
+- `POST /rule-packs/{id}/{version}:publish` - Publish draft
+- `POST /rule-packs/{id}/{version}:deprecate` - Deprecate pack
+- `PUT /rule-packs/{id}/{version}` - Edit draft pack
+- `DELETE /rule-packs/{id}/{version}` - Delete pack
+
+### Document Analysis
+- `POST /preview-run` - Upload PDF for analysis
+
+### MCP Protocol
+- `POST /mcp` - JSON-RPC MCP endpoint (used by LibreChat)
+
+---
+
+## 🎯 Use Cases & Demo Scenarios
+
+### Basic Contract Analysis
+1. Upload contract PDF via LibreChat
+2. System auto-detects document type
+3. Runs compliance checks against active rule packs
+4. Returns detailed findings with citations
+
+### Rule Pack Development
+1. Generate template: `Create a new rule pack for vendor agreements`
+2. Edit YAML through conversation: `Add liability cap requirement of $1M minimum`
+3. Validate and publish: `Publish this rule pack as version 1`
+4. Test immediately: `Analyze a contract with this new rule pack`
+
+### Compliance Monitoring
+1. Analyze multiple contracts in batch
+2. Generate compliance reports
+3. Track violations across document types
+4. Monitor rule pack effectiveness
+
+---
+
+## 🛣 Roadmap
+
+### Immediate (v1.3)
+- [ ] Enhanced LLM rationale generation
+- [ ] Multi-language document support
+- [ ] Advanced citation highlighting
+- [ ] Export compliance dashboards
+
+### Medium-term (v2.0)
+- [ ] Machine learning model integration
+- [ ] Custom rule pack templates
+- [ ] Advanced workflow automation
+- [ ] Enterprise user management
+
+### Long-term (v3.0)
+- [ ] Real-time collaboration features
+- [ ] Advanced analytics and reporting
+- [ ] Integration with legal databases
+- [ ] AI-powered contract drafting assistance
 
 ---
 
 ## 👥 Team
 
-- **Developer**: Noah Collins  
+- **Lead Developer**: Noah Collins
 - **Project Manager**: Trey Drake
+- **Architecture**: FastAPI + React + PostgreSQL + LibreChat MCP
+
+---
+
+## 📄 License
+
+This project is proprietary software developed for enterprise contract analysis applications.
+
+---
+
+## 🔗 Related Documentation
+
+- [CLAUDE.md](./CLAUDE.md) - Development guide for Claude Code
+- [LibreChat Integration Guide](./librechat/README.md) - Detailed integration instructions
+- [MCP Protocol Documentation](https://modelcontextprotocol.io/) - Model Context Protocol specification
+
+---
+
+**🚀 Ready to revolutionize contract analysis with AI-powered LibreChat integration!**
