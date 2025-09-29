@@ -1,8 +1,9 @@
 id: employment_v1
+schema_version: "1.0"
 doc_type_names:
-  - Employment Agreement
-  - Offer Letter
-  - Employment Contract
+  - "Employment Agreement"
+  - "Offer Letter"
+  - "Employment Contract"
 jurisdiction_allowlist:
   - United States
   - Canada

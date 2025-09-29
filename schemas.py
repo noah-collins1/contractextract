@@ -40,6 +40,12 @@ class Citation(BaseModel):
     char_start: int
     char_end: int
     quote: str
+    # Page and line information (1-based for UI display)
+    page: Optional[int] = None
+    line_start: Optional[int] = None
+    line_end: Optional[int] = None
+    # Confidence level for citation accuracy (1.0 = high confidence)
+    confidence: float = 1.0
 
 class Finding(BaseModel):
     # Was Literal[...] — now free-form so any rule pack can emit its own IDs.

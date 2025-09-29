@@ -299,70 +299,103 @@ def _call_llm_any(provider, *, doc_text: str, prompt: str):
 
 
 
-def _maybe_add_llm_explanations(text: str, rules: RuleSet, findings: List[Finding], max_failures: int = 3) -> List[Finding]:
+def _maybe_add_llm_explanations(text: str, rules: RuleSet, findings: List[Finding], max_failures: int = None, llm_override: bool = None) -> List[Finding]:
     """
-    Append concise LLM rationales to failing findings when ENABLE_LLM_EXPLANATIONS is truthy.
+    Append concise LLM rationales to failing findings. Now enabled by default.
     Always adds a status finding so it's obvious whether this step ran and which mode was used.
     """
-    flag_raw = os.getenv("ENABLE_LLM_EXPLANATIONS", "")
-    enabled = flag_raw.lower() in ("1", "true", "yes", "on")
+    from settings import settings
 
-    status = [f"env.ENABLE_LLM_EXPLANATIONS={flag_raw!r} -> {'enabled' if enabled else 'disabled'}"]
+    enabled = settings.get_llm_enabled(llm_override)
+    max_failures = max_failures or settings.LLM_MAX_EXPLANATIONS
+
+    status = [f"llm_explanations={'enabled' if enabled else 'disabled'} (default=enabled, override={llm_override})"]
     if not enabled:
         findings.append(Finding(rule_id="llm_explanations_status", passed=True, details="LLM explanations disabled.", citations=[], tags=[]))
         return findings
 
     # Load provider
+    provider = None
     try:
         from llm_factory import load_provider
         provider = load_provider()
         status.append(f"provider_loaded={bool(provider)}")
+        if provider is None:
+            status.append("provider_loaded=False (returned None)")
+    except ImportError as e:
+        status.append(f"provider_import_error={e!r}")
+        findings.append(Finding(rule_id="llm_explanations_status", passed=False, details="LLM provider module could not be imported: {}".format(e), citations=[], tags=[]))
+        return findings
     except Exception as e:
         status.append(f"provider_error={e!r}")
         findings.append(Finding(rule_id="llm_explanations_status", passed=False, details="LLM provider could not be loaded: {}".format(e), citations=[], tags=[]))
         return findings
 
+    if provider is None:
+        findings.append(Finding(rule_id="llm_explanations_status", passed=False, details="LLM provider returned None", citations=[], tags=[]))
+        return findings
+
     used = 0
     updated: List[Finding] = []
+    failed_findings = [f for f in findings if not f.passed]
+
     for f in findings:
-        if not f.passed and used < max_failures:
+        if not f.passed and used < max_failures and f.rule_id != "llm_explanations_status":
             # Local context around first citation
             snippet = ""
-            if f.citations:
+            if f.citations and len(f.citations) > 0:
                 c = f.citations[0]
                 s = max(0, min(len(text), c.char_start))
                 e = max(0, min(len(text), c.char_end))
                 snippet = text[max(0, s - 300): min(len(text), e + 300)]
+            elif text:
+                # If no citations, use first part of document
+                snippet = text[:600]
 
-            findings_summary = "\n".join(f"- {x.rule_id}: {'PASS' if x.passed else 'FAIL'} — {x.details}" for x in findings[:8])
+            # Create context from only failed findings
+            failed_summary = "\n".join(f"- {x.rule_id}: {x.details[:100]}{'...' if len(x.details) > 100 else ''}" for x in failed_findings[:5] if x.rule_id != "llm_explanations_status")
 
             prompt = (
-                "You are a meticulous contracts analyst. Explain, in 3–5 sentences, why the following finding likely failed, "
-                "pointing to concrete contract language. Avoid hallucinations; if unsure, say so.\n\n"
-                f"Finding ID: {f.rule_id}\n"
-                f"Other findings (context):\n{findings_summary}\n\n"
+                "You are a meticulous contracts analyst. Explain in 2-4 sentences why this compliance finding failed. "
+                "Focus on specific contract language issues and provide actionable remediation advice.\n\n"
+                f"Failed Finding: {f.rule_id}\n"
+                f"Details: {f.details}\n\n"
+                "Other failed findings for context:\n"
+                f"{failed_summary}\n\n"
                 "Relevant contract excerpt:\n-----\n"
-                f"{snippet}\n-----\n\n"
-                "Answer format:\n"
-                "Reasoning: <plain-language rationale>\n"
-                "Risk: <specific risk if unaddressed>\n"
-                "Suggested Fix: <practical remediation language>\n"
+                f"{snippet[:800]}\n-----\n\n"
+                "Provide a concise analysis in this format:\n"
+                "Reasoning: [why this specific rule failed]\n"
+                "Risk: [business/legal risk if unaddressed]\n"
+                "Fix: [specific contract language to add/modify]\n"
             )
 
-            mode, rationale = _call_llm_any(provider, doc_text=text, prompt=prompt)
-            rationale = (rationale or "").strip()
-            tag = f" [mode: {mode}]"
-            if rationale:
-                f = Finding(
-                    rule_id=f.rule_id,
-                    passed=f.passed,
-                    details=f"{f.details}\n\nLLM rationale:{tag}\n{rationale[:1200]}",
-                    citations=f.citations,
-                    tags=getattr(f, "tags", []),
-                )
-                used += 1
+            try:
+                mode, rationale = _call_llm_any(provider, doc_text=text, prompt=prompt)
+                rationale = (rationale or "").strip()
+
+                if rationale and not rationale.startswith("[llm error:"):
+                    # Clean up the rationale
+                    rationale_lines = rationale.split('\n')[:10]  # Limit length
+                    cleaned_rationale = '\n'.join(line.strip() for line in rationale_lines if line.strip())
+
+                    f = Finding(
+                        rule_id=f.rule_id,
+                        passed=f.passed,
+                        details=f"{f.details}\n\n**LLM Analysis [{mode}]:**\n{cleaned_rationale[:800]}",
+                        citations=f.citations,
+                        tags=getattr(f, "tags", []),
+                    )
+                    used += 1
+                    status.append(f"explanation_added_for={f.rule_id}")
+                else:
+                    status.append(f"explanation_failed_for={f.rule_id}: {rationale[:100] if rationale else 'empty_response'}")
+            except Exception as e:
+                status.append(f"explanation_error_for={f.rule_id}: {e!r}")
+
         updated.append(f)
 
+    status.append(f"explanations_added={used}/{len(failed_findings)}")
     findings = updated
     findings.append(Finding(rule_id="llm_explanations_status", passed=True, details="; ".join(status), citations=[], tags=[]))
     return findings
@@ -373,17 +406,37 @@ def _maybe_add_llm_explanations(text: str, rules: RuleSet, findings: List[Findin
 
 
 # ---- Main API ----
-def make_report(document_name: str, text: str, rules: RuleSet) -> DocumentReport:
+def make_report(document_name: str, text: str, rules: RuleSet, llm_override: bool = None) -> DocumentReport:
+    """
+    Generate a compliance report for a document.
+
+    Args:
+        document_name: Name of the document being analyzed
+        text: Document text content
+        rules: Rule set to apply
+        llm_override: Override for LLM explanations (None = use default)
+
+    Returns:
+        DocumentReport with findings and LLM explanations
+    """
+    from settings import settings
+    from citation_mapper import enhance_citations_with_page_line
+
     findings, _guess = evaluate_text_against_rules(text, rules) or ([], None)
-    print("[debug] ENABLE_LLM_EXPLANATIONS =", os.getenv("ENABLE_LLM_EXPLANATIONS"))
+    print(f"[debug] LLM explanations = {settings.get_llm_enabled(llm_override)} (default=enabled, override={llm_override})")
 
     if findings:
-        # Generic guard (keeps “200 million shares” out of money checks)
+        # Enhance citations with page and line information
+        for finding in findings:
+            if finding.citations:
+                finding.citations = enhance_citations_with_page_line(text, finding.citations)
+
+        # Generic guard (keeps "200 million shares" out of money checks)
         findings = _maybe_guard_monetary_false_positives(text, findings)
         # Rule-aware normalization (fixes contract-value + jurisdiction contradictions)
         findings = _normalize_findings_with_rules(text, rules, findings)
-        # NEW: append concise LLM rationales for failing findings (if enabled)
-        findings = _maybe_add_llm_explanations(text, rules, findings)
+        # LLM rationales for failing findings (now enabled by default)
+        findings = _maybe_add_llm_explanations(text, rules, findings, llm_override=llm_override)
 
     if not findings:
         findings = [Finding(
@@ -402,7 +455,38 @@ def render_markdown(report: DocumentReport) -> str:
     lines.append("")
     lines.append(f"**Overall:** {'✅ PASS' if report.passed_all else '❌ FAIL'}")
     lines.append("")
+
+    # Add Executive Summary for failing cases
+    if not report.passed_all:
+        failed_findings = [f for f in report.findings if not f.passed and f.rule_id != "llm_explanations_status"]
+        if failed_findings:
+            lines.append("## Executive Summary")
+            lines.append("")
+
+            # Get top 3 failing rules
+            top_failed = failed_findings[:3]
+            summary_parts = []
+
+            for f in top_failed:
+                rule_name = (f.rule_id or "").replace("_", " ").title()
+                summary_parts.append(f"**{rule_name}**: {f.details}")
+
+            if summary_parts:
+                lines.append("This contract analysis identified critical compliance issues that require immediate attention:")
+                lines.append("")
+                for part in summary_parts:
+                    lines.append(f"- {part}")
+                lines.append("")
+                lines.append("**Risk Assessment**: These violations may expose the organization to legal and financial liabilities. Immediate remediation is recommended to ensure contractual compliance and risk mitigation.")
+                lines.append("")
+                lines.append("**Recommended Action**: Review and revise the identified clauses to align with compliance requirements before contract execution.")
+                lines.append("")
+
     for f in report.findings:
+        # Skip status findings in the detailed section
+        if f.rule_id == "llm_explanations_status":
+            continue
+
         title = (f.rule_id or "").replace("_", " ").title() or "Finding"
         lines.append(f"## {title}")
         lines.append(f"- **Result:** {'PASS' if f.passed else 'FAIL'}")
@@ -413,8 +497,34 @@ def render_markdown(report: DocumentReport) -> str:
                 quote = (c.quote or "").replace("\r"," ").replace("\n"," ").strip()
                 if len(quote) > 420:
                     quote = quote[:420] + "…"
-                lines.append(f"  - chars [{c.char_start}-{c.char_end}]: “{quote}”")
+
+                # Build citation with page and line info
+                citation_parts = []
+                if c.page is not None:
+                    if c.line_start is not None and c.line_end is not None:
+                        if c.line_start == c.line_end:
+                            citation_parts.append(f"p. {c.page}, line {c.line_start}")
+                        else:
+                            citation_parts.append(f"p. {c.page}, lines {c.line_start}–{c.line_end}")
+                    else:
+                        citation_parts.append(f"p. {c.page}")
+
+                citation_parts.append(f"chars [{c.char_start}-{c.char_end}]")
+                citation_info = ", ".join(citation_parts)
+
+                confidence_note = ""
+                if c.confidence < 1.0:
+                    confidence_note = f" (confidence: {c.confidence:.1f})"
+
+                lines.append(f"  - {citation_info}: \"{quote}\"{confidence_note}")
         lines.append("")
+
+    # Add citation footnote
+    lines.append("---")
+    lines.append("")
+    lines.append("**Citations Note:** Page and line numbers are computed from the PDF text extraction layout. Page numbers are 1-based, line numbers reflect text layout post-extraction.")
+    lines.append("")
+
     return "\n".join(lines)
 
 def save_markdown(report: DocumentReport, out_dir: Path):

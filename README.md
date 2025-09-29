@@ -98,6 +98,15 @@ contractextract/
 ├── data/                        # 📄 Test PDFs for batch processing
 ├── outputs/                     # 📊 Generated reports and analysis results
 ├── rules_packs/                 # 📋 YAML rule pack definitions
+│   ├── _TEMPLATE.yml             # Standard schema template
+│   ├── strategic_alliance.yml    # Reference implementation
+│   ├── employment.yml            # Employment contract rules
+│   ├── noncompete.yml            # Non-compete agreement rules
+│   ├── ip_agreement.yml          # IP assignment rules
+│   ├── joint_venture.yml         # Joint venture rules
+│   ├── promotion.yml             # Marketing promotion rules
+│   └── servicing.yml             # Service agreement rules
+├── validate_yaml_rulepacks.py    # YAML validation script
 └── archive/                     # 🗂 Legacy evaluation code
 ```
 
@@ -125,6 +134,92 @@ contractextract/
 | `created_by`             | text        | Author/creator identifier                     |
 | `created_at`             | timestamptz | Creation timestamp                            |
 | `updated_at`             | timestamptz | Last modification timestamp                   |
+
+---
+
+## 📋 YAML Rule Pack Schema (v1.0)
+
+ContractExtract uses a **standardized YAML schema** for rule pack definitions. All rule packs must conform to **Schema Version 1.0** for compatibility and consistency.
+
+### Standard Schema Structure
+
+#### **Required Fields** (Must be present in every rule pack):
+
+```yaml
+id: "unique_identifier_v1"                    # Unique rule pack identifier
+schema_version: "1.0"                         # Schema compatibility version
+doc_type_names:                               # Document types for auto-detection
+  - "Primary Document Type"
+  - "Alternative Document Type"
+jurisdiction_allowlist:                       # Allowed governing law jurisdictions
+  - "United States"
+  - "Canada"
+liability_cap:                                # Liability cap policy
+  max_cap_amount: 1000000.0                   # Max absolute cap (null = no limit)
+  max_cap_multiplier: 1.0                     # Max cap as contract multiplier
+contract:                                     # Contract value constraints
+  max_contract_value: 5000000.0               # Max total contract value
+fraud:                                        # Fraud clause requirements
+  require_fraud_clause: true                  # Whether fraud clause required
+  require_liability_on_other_party: true      # Whether fraud liability must be assigned
+prompt: |                                     # Structured LLM extraction prompt
+  Standardized prompt format for extractions...
+examples:                                     # Training examples
+  - text: "Sample contract text"
+    extractions:
+      - label: "extraction_type"
+        span: "relevant text span"
+        attributes: { key: value }
+```
+
+#### **Optional Fields** (May be present):
+
+```yaml
+rules:                                        # Extended domain-specific rules
+  - id: custom_rule_id
+    type: domain.rule_type
+    params:
+      custom_param: true
+notes: "Description and metadata"             # Documentation
+extensions:                                   # Custom fields
+  custom_field: "value"
+extensions_schema:                            # Schema for extensions validation
+  type: "object"
+  properties:
+    custom_field:
+      type: "string"
+```
+
+### Schema Benefits
+
+- **🔗 Interoperability**: All rule packs work with the same import/export system
+- **🛠 Maintainability**: Easy to update multiple rule packs with schema changes
+- **📈 Extensibility**: `rules` and `extensions` sections allow domain-specific customizations
+- **✅ Quality Assurance**: Automated validation prevents malformed rule packs
+
+### Validation
+
+Use the included validation script to ensure YAML compliance:
+
+```powershell
+python validate_yaml_rulepacks.py
+```
+
+**Validation Features:**
+- **Required field checking**: Ensures all mandatory fields are present
+- **Type validation**: Verifies correct data types (strings, lists, dicts)
+- **Structure constraints**: Validates nested field requirements
+- **Schema version compatibility**: Checks against declared schema version
+
+### Available Rule Packs
+
+- **`strategic_alliance.yml`** - Strategic partnerships, liability limits, fraud protection
+- **`employment.yml`** - Employment contracts, termination, worker classification
+- **`noncompete.yml`** - Non-compete agreements, duration, geographic scope
+- **`ip_agreement.yml`** - IP assignment, moral rights, license-back provisions
+- **`joint_venture.yml`** - Capital contributions, deadlock resolution, exit strategies
+- **`promotion.yml`** - Marketing agreements, performance metrics, renewals
+- **`servicing.yml`** - Service agreements, SLAs, liability allocation
 
 ---
 

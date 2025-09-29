@@ -1,12 +1,13 @@
 id: servicing_v1
+schema_version: "1.0"
 doc_type_names:
-  - Service Agreement
-  - Master Services Agreement
-  - Servicing Agreement
+  - "Service Agreement"
+  - "Master Services Agreement"
+  - "Servicing Agreement"
 jurisdiction_allowlist:
-  - United States
-  - Canada
-  - European Union
+  - "United States"
+  - "Canada"
+  - "European Union"
 liability_cap:
   max_cap_amount: null
   max_cap_multiplier: null
@@ -54,16 +55,18 @@ examples:
     extractions:
       - label: breach_remedy
         span: "Customer may receive service credits"
-  - text: "Customer’s liability shall be unlimited, while Provider’s liability is capped at $10,000."
+  - text: "Customer's liability shall be unlimited, while Provider's liability is capped at $10,000."
     extractions:
       - label: liability_clause
-        span: "Customer’s liability shall be unlimited"
+        span: "Customer's liability shall be unlimited"
         attributes: { party: "Customer", cap: "unlimited" }
-  - text: "Either party may terminate for convenience upon thirty (30) days’ written notice."
+  - text: "Either party may terminate for convenience upon thirty (30) days' written notice."
     extractions:
       - label: termination_rights
-        span: "terminate for convenience upon thirty (30) days’ written notice"
+        span: "terminate for convenience upon thirty (30) days' written notice"
   - text: "This Agreement will automatically renew for successive one-year terms unless canceled 60 days prior."
     extractions:
       - label: auto_renewal
         span: "automatically renew for successive one-year terms unless canceled 60 days prior"
+
+notes: "Service agreements covering SLAs, breach remedies, liability allocation, and termination rights"

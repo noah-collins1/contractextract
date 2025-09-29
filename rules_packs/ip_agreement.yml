@@ -1,12 +1,13 @@
 id: ip_agreement_v1
+schema_version: "1.0"
 doc_type_names:
-  - Intellectual Property Agreement
-  - IP Assignment
-  - Proprietary Rights Agreement
+  - "Intellectual Property Agreement"
+  - "IP Assignment"
+  - "Proprietary Rights Agreement"
 jurisdiction_allowlist:
-  - United States
-  - Canada
-  - European Union
+  - "United States"
+  - "Canada"
+  - "European Union"
 liability_cap:
   max_cap_amount: null
   max_cap_multiplier: null

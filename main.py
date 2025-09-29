@@ -1,7 +1,7 @@
 # main.py — local runner with Postgres rule packs + doc-type detection + optional concurrency
 from __future__ import annotations
 
-import os, re, json, time, hashlib, logging, shutil, sys
+import os, re, json, time, hashlib, logging, shutil, sys, argparse
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from telemetry import go_quiet
@@ -9,8 +9,7 @@ import langextract as lx
 import pydantic
 from ingest import ingest
 from llm_factory import load_provider
-import os
-os.environ["ENABLE_LLM_EXPLANATIONS"] = "1"
+# LLM explanations now enabled by default via centralized settings
 
 from evaluator import make_report, save_markdown, save_txt
 from doc_type import guess_doc_type_id
@@ -345,8 +344,9 @@ def process_document(name: str, text: str, pack_dict: dict, outputs_dir_str: str
         except Exception as viz_e:
             (out_dir / "_viz_error.txt").write_text(str(viz_e), encoding="utf-8", errors="replace")
 
-        # Evaluate & save reports
-        report = make_report(document_name=name, text=text, rules=pack.rules)
+        # Evaluate & save reports (with optional LLM override from CLI)
+        llm_override = getattr(process_document, '_llm_override', None)
+        report = make_report(document_name=name, text=text, rules=pack.rules, llm_override=llm_override)
         save_markdown(report, out_dir)
         save_txt(report, out_dir)
 
@@ -367,7 +367,8 @@ def process_document(name: str, text: str, pack_dict: dict, outputs_dir_str: str
         except Exception as viz_e:
             (out_dir / "_viz_error.txt").write_text(str(viz_e), encoding="utf-8", errors="replace")
 
-        report = make_report(document_name=name, text=text, rules=pack.rules)
+        llm_override = getattr(process_document, '_llm_override', None)
+        report = make_report(document_name=name, text=text, rules=pack.rules, llm_override=llm_override)
         save_markdown(report, out_dir)
         save_txt(report, out_dir)
 
@@ -377,6 +378,16 @@ def process_document(name: str, text: str, pack_dict: dict, outputs_dir_str: str
 # Main
 # ------------------------------
 def main():
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description="ContractExtract CLI runner")
+    parser.add_argument("--no-llm", action="store_true", help="Disable LLM explanations for debugging")
+    args = parser.parse_args()
+
+    # Set LLM override on the process_document function (for worker access)
+    if args.no_llm:
+        process_document._llm_override = False
+        print("[CLI] LLM explanations disabled via --no-llm flag")
+
     init_db()  # safe to call every run
 
     # 1) Load active packs from Postgres

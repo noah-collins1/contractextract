@@ -1,11 +1,12 @@
 id: promotion_v1
+schema_version: "1.0"
 doc_type_names:
-  - Promotion Agreement
-  - Marketing Promotion Agreement
+  - "Promotion Agreement"
+  - "Marketing Promotion Agreement"
 jurisdiction_allowlist:
-  - United States
-  - Canada
-  - European Union
+  - "United States"
+  - "Canada"
+  - "European Union"
 liability_cap:
   max_cap_amount: null
   max_cap_multiplier: null
@@ -53,10 +54,10 @@ examples:
     extractions:
       - label: clawback
         span: "return all bonuses previously paid"
-  - text: "This agreement automatically renews unless either party gives 90 days’ notice."
+  - text: "This agreement automatically renews unless either party gives 90 days' notice."
     extractions:
       - label: auto_renewal
-        span: "automatically renews unless either party gives 90 days’ notice"
+        span: "automatically renews unless either party gives 90 days' notice"
   - text: "If terminated early, Promoter owes a fee equal to one month of average commissions."
     extractions:
       - label: termination_penalty
@@ -65,3 +66,5 @@ examples:
     extractions:
       - label: exclusivity
         span: "exclusive within the Northeast territory"
+
+notes: "Promotion and marketing agreements covering performance metrics, renewals, and territorial exclusivity"

@@ -23,12 +23,15 @@ def import_rulepack_yaml(db: Session, yaml_text: str, created_by: str | None = N
 
     payload = RulePackCreate(
         id=raw["id"],
+        schema_version=raw.get("schema_version", "1.0"),
         doc_type_names=raw.get("doc_type_names", []) or [],
         rules=rules,
         llm_prompt=raw.get("prompt") or None,
         examples=examples,
         # optional
         rules_json=raw.get("rules", []) or [],
+        extensions=raw.get("extensions"),
+        extensions_schema=raw.get("extensions_schema"),
         raw_yaml=yaml_text,
         created_by=created_by,
         notes=raw.get("notes"),

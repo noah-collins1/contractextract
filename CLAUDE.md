@@ -4,19 +4,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
-### Backend (Python FastAPI)
+### Backend (Python FastAPI) - Pydantic v2 Environment
 ```bash
-# Install dependencies
-pip install -r requirements
+# Activate the v2 environment
+.\.venv-v2\Scripts\Activate.ps1
+
+# Install dependencies (if needed)
+pip install -r requirements-v2.txt
 
 # Initialize database tables
 python bootstrap_db.py
 
-# Run the API server
+# Run the API server with MCP integration
 uvicorn app:app --reload --port 8000
 
 # Run batch processing on PDFs in data/ folder
 python main.py
+
+# Validate YAML rule packs
+python validate_yaml_rulepacks.py
 ```
 
 ### Frontend (React/TypeScript)
@@ -382,3 +388,299 @@ mcpServers:
 set USE_V1_BRIDGE=0
 uvicorn app:app --host 127.0.0.1 --port 8000 --reload
 ```
+
+---
+
+# Latest Updates - Enhanced Pipeline & Advanced Features
+
+## Comprehensive System Overhaul (Current Session)
+
+### 1. LLM Explanations Always Enabled
+- **Centralized Configuration**: Created `settings.py` with `LLM_EXPLANATIONS_ENABLED = True` as default
+- **Per-Request Override**: Added `llm_override` parameter for debugging across API and CLI
+- **CLI Support**: Added `--no-llm` flag to main.py (`python main.py --no-llm`)
+- **Unified Processing**: Both API and CLI use identical LLM explanation pipeline
+- **Budget Controls**: Token limits and timeout protection to prevent runaway costs
+
+### 2. Precise Page + Line Number Citations
+- **Enhanced Citation Schema**: Citations now include `page`, `line_start`, `line_end`, `confidence` fields
+- **Citation Mapper**: New `citation_mapper.py` with `PageLineMapper` class for accurate position mapping
+- **Enhanced Display**: Citations show as `p. 7, lines 22–27, chars [1234-1456]: "quote" (confidence: 1.0)`
+- **Page Break Preservation**: Leverages existing `\f` page separators from PDF extraction
+- **Confidence Tracking**: Marks low-confidence citations for OCR-needed documents
+
+### 3. Unified API and CLI Execution Paths
+- **Single Service Function**: Both API and CLI call identical `make_report()` function
+- **Consistent Rendering**: Removed duplicate markdown functions, unified `render_markdown()`
+- **Same Pipeline**: Identical citation enhancement, LLM processing, and output generation
+- **Metadata Consistency**: Both paths emit identical metadata structure
+- **Command Line Arguments**: CLI now supports `--no-llm` for debugging
+
+### 4. Enhanced Document Type Detection
+- **Rules-First Scoring**: Weighted keyword analysis with configurable scoring weights
+- **Section Header Detection**: Pattern matching for document structure analysis
+- **LLM Fallback**: Optional LLM classification for low-confidence cases (configurable threshold)
+- **Detailed Metadata**: Includes top 3 candidates with scores, confidence, and reasoning
+- **Transparent Selection**: Full audit trail of document type selection process
+
+### 5. Dual Response Format Support
+- **JSON Endpoint** (`/preview-run`): Structured response with rich metadata for automation
+- **Markdown Endpoint** (`/preview-run.md`): Pure markdown as `text/markdown` for direct download
+- **Consistent Processing**: Both endpoints use identical analysis pipeline
+- **SwaggerUI Integration**: JSON visible in Swagger, markdown available for browser preview
+
+### 6. Enhanced API Response Structure
+- **SHA1 Document Tracking**: Unique document identification and duplicate detection
+- **Rich Metadata**: Enhanced `meta` field with comprehensive processing information
+- **Document Type Detection**: Complete candidate analysis and selection reasoning
+- **Executive Summaries**: Automatic summaries for failed cases with top 3 failing rules
+- **Processing Audit**: Full logging with SHA1, pack selection, and timing information
+
+### 7. Comprehensive OpenAPI Documentation
+- **Rich Examples**: Complete YAML rule pack examples for strategic alliance and employment
+- **Multiple Input Formats**: Examples for both JSON patch and YAML replacement updates
+- **Copy-Ready Templates**: Production-ready examples following schema v1.0 standard
+- **Clear Documentation**: Detailed endpoint descriptions with use case guidance
+
+## API Improvements (Previous Session)
+
+### 1. Enhanced API Response Tracking
+- **SHA1 Hashing**: Added document SHA1 calculation and logging for unique processing verification
+- **Metadata Response**: Enhanced `/preview-run` endpoint with `meta` field containing:
+  - `filename`: Original document name
+  - `sha1`: Document content hash
+  - `selected_pack_id`: Rule pack used for analysis
+  - `pass_fail`: Overall compliance result
+- **Structured Logging**: Added comprehensive logging with filename, SHA1, pack ID, and results
+
+### 2. Improved LLM Explanation System
+- **Executive Summary**: Added comprehensive executive summary for failed compliance reports
+  - Highlights top 3 failing rules with clear descriptions
+  - Risk assessment explaining potential legal/financial liabilities
+  - Recommended remediation actions
+- **Enhanced LLM Integration**:
+  - Better error handling for provider loading and import issues
+  - More robust handling of empty or failed LLM responses
+  - Cleaner prompt formatting focused on actionable insights
+  - Better filtering to avoid processing status findings
+
+### 3. Report Generation Enhancements
+- **Executive Summary Section**: Automatically prepended to failed compliance reports
+- **Improved Citation Handling**: Better quote truncation and formatting
+- **Status Finding Management**: LLM explanation status findings properly excluded from main report
+- **Enhanced Markdown Rendering**: Both API and batch processing use consistent formatting
+
+## YAML Rule Pack Schema Standardization (v1.0)
+
+### Schema Version System
+- **Current Version**: `"1.0"` - All rule packs must declare this version
+- **Version Tracking**: `schema_version` field added to all rule packs for compatibility
+- **Future Evolution**: Version system enables safe schema changes while maintaining backward compatibility
+
+### Standardized Schema Structure
+
+#### Required Fields (Must be present):
+```yaml
+id: "unique_identifier_v1"                    # Unique rule pack identifier
+schema_version: "1.0"                         # Schema compatibility version
+doc_type_names:                               # Document types for auto-detection
+  - "Primary Document Type"
+jurisdiction_allowlist:                       # Allowed governing law jurisdictions
+  - "United States"
+liability_cap:                                # Liability cap policy
+  max_cap_amount: 1000000.0                   # Max absolute cap
+  max_cap_multiplier: 1.0                     # Max cap as contract multiplier
+contract:                                     # Contract value constraints
+  max_contract_value: 5000000.0               # Max total contract value
+fraud:                                        # Fraud clause requirements
+  require_fraud_clause: true
+  require_liability_on_other_party: true
+prompt: |                                     # Structured LLM extraction prompt
+  Standardized prompt format...
+examples:                                     # Training examples
+  - text: "Sample text"
+    extractions: [...]
+```
+
+#### Optional Fields:
+```yaml
+rules:                                        # Extended domain-specific rules
+  - id: custom_rule_id
+    type: domain.rule_type
+    params: {...}
+notes: "Description and metadata"             # Documentation
+extensions: {...}                             # Custom fields
+extensions_schema: {...}                      # Schema for extensions validation
+```
+
+### Schema Benefits
+- **Interoperability**: All rule packs work with same import/export system
+- **Maintainability**: Easy to update multiple rule packs with schema changes
+- **Extensibility**: `rules` and `extensions` sections allow domain-specific customizations
+- **Quality Assurance**: Automated validation prevents malformed rule packs
+
+### Validation System
+- **Validation Script**: `validate_yaml_rulepacks.py` checks all rule packs
+- **Automated Checking**: Required fields, data types, structure constraints
+- **Schema Compliance**: Validates against declared schema version
+- **Error Reporting**: Detailed validation errors with specific line references
+
+### Updated Rule Packs
+All rule packs now conform to v1.0 schema:
+- ✅ `strategic_alliance.yml` - Reference implementation
+- ✅ `employment.yml` - Employment contract rules
+- ✅ `noncompete.yml` - Non-compete agreement rules
+- ✅ `ip_agreement.yml` - IP assignment rules
+- ✅ `joint_venture.yml` - Joint venture rules
+- ✅ `promotion.yml` - Marketing promotion rules
+- ✅ `servicing.yml` - Service agreement rules
+- ✅ `_TEMPLATE.yml` - Standard schema template
+
+### YAML Importer Updates
+- **Schema Version Support**: Handles `schema_version` field
+- **Extensions Support**: Processes `extensions` and `extensions_schema` fields
+- **Backward Compatibility**: Defaults to v1.0 for legacy rule packs
+
+## Development Workflow Improvements
+
+### New Tools and Scripts
+- **`validate_yaml_rulepacks.py`**: Comprehensive YAML validation
+- **`fix_yaml_files.py`**: Batch YAML fixing utility (used during migration)
+- **`_TEMPLATE.yml`**: Canonical rule pack template
+
+### File Organization
+```
+rules_packs/
+├── _TEMPLATE.yml              # Standard schema template
+├── strategic_alliance.yml     # Reference implementation
+├── employment.yml             # Fixed and validated
+├── noncompete.yml             # Fixed and validated
+├── ip_agreement.yml           # Fixed and validated
+├── joint_venture.yml          # Fixed and validated
+├── promotion.yml              # Fixed and validated
+└── servicing.yml              # Fixed and validated
+```
+
+### Testing and Validation
+- **YAML Validation**: All rule packs pass schema validation
+- **API Testing**: Enhanced metadata logging for debugging
+- **LLM Integration**: Improved error handling and status reporting
+
+## Key Commands for Development
+
+### Validate All Rule Packs
+```powershell
+python validate_yaml_rulepacks.py
+```
+
+### Test API with Enhanced Logging
+```powershell
+.\.venv-v2\Scripts\Activate.ps1
+uvicorn app:app --reload --port 8000
+# Check logs for SHA1 hashes and processing details
+```
+
+### Import/Update Rule Packs
+```powershell
+# Via API (maintains schema validation)
+curl -X POST http://localhost:8000/rule-packs/import-yaml \
+  -H "Content-Type: application/json" \
+  -d '{"yaml_text": "..."}'
+```
+
+## Future Schema Evolution
+
+### Planned Enhancements (v1.1+)
+- Additional optional fields for enhanced metadata
+- Extended rule types for specialized domains
+- Enhanced validation constraints
+- Improved LLM prompt templates
+
+### Migration Strategy
+- Schema version tracking enables safe migrations
+- Validation system prevents breaking changes
+- Backward compatibility maintained across versions
+
+## Enhanced File Structure (Latest Session)
+
+### New Core Components
+```
+contractextract/
+├── settings.py                    # NEW: Centralized configuration
+├── citation_mapper.py             # NEW: Page/line position mapping
+├── document_classifier.py         # NEW: Enhanced document type detection
+├── validate_yaml_rulepacks.py     # Enhanced YAML validation
+├── TEST_PLAN.md                   # NEW: Comprehensive testing guide
+├── CHANGELOG.md                   # NEW: Version tracking and changes
+└── rules_packs/
+    ├── _TEMPLATE.yml              # Enhanced standard template
+    └── *.yml                      # All files now schema v1.0 compliant
+```
+
+### Enhanced API Endpoints
+- **`/preview-run`**: Enhanced JSON response with rich metadata
+- **`/preview-run.md`**: NEW markdown-only endpoint for direct download
+- **`/rule-packs/import-yaml`**: Enhanced with comprehensive OpenAPI examples
+- **`/rule-packs/{id}/{version}`**: Enhanced with schema version support
+
+### Testing and Quality Assurance
+```powershell
+# Comprehensive validation
+python validate_yaml_rulepacks.py
+
+# CLI with debugging
+python main.py --no-llm
+
+# API testing with rich examples
+# Visit http://localhost:8000/docs for interactive examples
+```
+
+### Configuration Management
+All settings now centralized in `settings.py`:
+- **LLM_EXPLANATIONS_ENABLED**: `True` (always on by default)
+- **DOC_TYPE_CONFIDENCE_THRESHOLD**: `0.65` (LLM fallback trigger)
+- **LLM_MAX_TOKENS_PER_RUN**: `10000` (budget control)
+- **Citation settings**: Context chars, quote length limits
+
+### Quality Metrics
+- **✅ 100% YAML Validation**: All 8 rule packs pass validation
+- **✅ Unified Processing**: API and CLI use identical pipelines
+- **✅ Rich Citations**: Page/line numbers with confidence scoring
+- **✅ Enhanced Documentation**: Comprehensive OpenAPI examples
+- **✅ Executive Summaries**: Auto-generated for failed compliance
+
+### Key Testing Scenarios
+1. **Document Upload**: Test with different file types and sizes
+2. **Document Type Detection**: Verify auto-detection with confidence scoring
+3. **Citation Accuracy**: Check page/line number mapping
+4. **LLM Integration**: Test explanations with budget controls
+5. **API Response Formats**: JSON vs Markdown endpoints
+6. **Schema Validation**: YAML rule pack compliance
+
+## Production Readiness Checklist
+
+### Environment Setup
+- [ ] PostgreSQL database running with `contractextract` database
+- [ ] `.venv-v2` environment activated with all dependencies
+- [ ] LLM provider configured (Ollama or alternative)
+- [ ] All YAML rule packs validated with `validate_yaml_rulepacks.py`
+
+### API Functionality
+- [ ] Server starts successfully on port 8000
+- [ ] SwaggerUI accessible at `/docs` with examples
+- [ ] Document upload works with SHA1 tracking
+- [ ] Both `/preview-run` and `/preview-run.md` endpoints functional
+- [ ] Document type detection provides detailed metadata
+
+### Quality Assurance
+- [ ] LLM explanations generate correctly with budget controls
+- [ ] Page/line citations appear with confidence scores
+- [ ] Executive summaries generated for failed cases
+- [ ] API and CLI produce identical results for same input
+- [ ] Comprehensive logging shows processing audit trail
+
+## important-instruction-reminders
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.

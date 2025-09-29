@@ -1,12 +1,13 @@
 id: noncompete_v1
+schema_version: "1.0"
 doc_type_names:
-  - Non-Compete Agreement
-  - Noncompetition Agreement
-  - Covenant Not to Compete
+  - "Non-Compete Agreement"
+  - "Noncompetition Agreement"
+  - "Covenant Not to Compete"
 jurisdiction_allowlist:
-  - United States
-  - Canada
-  - European Union
+  - "United States"
+  - "Canada"
+  - "European Union"
 liability_cap:
   max_cap_amount: null
   max_cap_multiplier: null

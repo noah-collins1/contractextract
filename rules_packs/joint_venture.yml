@@ -1,11 +1,12 @@
 id: joint_venture_v1
+schema_version: "1.0"
 doc_type_names:
-  - Joint Venture Agreement
-  - JV Agreement
+  - "Joint Venture Agreement"
+  - "JV Agreement"
 jurisdiction_allowlist:
-  - United States
-  - Canada
-  - European Union
+  - "United States"
+  - "Canada"
+  - "European Union"
 liability_cap:
   max_cap_amount: null
   max_cap_multiplier: null
@@ -65,7 +66,9 @@ examples:
     extractions:
       - label: exit_strategy
         span: "right of first refusal"
-  - text: "Each Party’s liability shall be capped at the fees paid in the preceding twelve (12) months."
+  - text: "Each Party's liability shall be capped at the fees paid in the preceding twelve (12) months."
     extractions:
       - label: liability_clause
         span: "capped at the fees paid in the preceding twelve (12) months"
+
+notes: "Joint venture agreements covering capital contributions, governance, IP ownership, and exit strategies"

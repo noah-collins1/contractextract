@@ -2,8 +2,11 @@
 from __future__ import annotations
 from typing import Optional, List, Dict, Any, Union
 import yaml
+import hashlib
+import logging
 from fastapi import FastAPI, UploadFile, File, Form, Depends, HTTPException, Query, Body
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -54,6 +57,7 @@ class PreviewRunOut(BaseModel):
     document_name: str
     pack_id: str
     report_markdown: str
+    meta: dict
 
 class DeleteResult(BaseModel):
     id: str
@@ -68,26 +72,7 @@ class UpdateDraftInYaml(BaseModel):
     yaml_text: str
 
 # --------- Helpers ---------
-def _render_markdown_inline(report) -> str:
-    lines = []
-    lines.append(f"# Compliance Report — {report.document_name}")
-    lines.append("")
-    lines.append(f"**Overall:** {'✅ PASS' if report.passed_all else '❌ FAIL'}")
-    lines.append("")
-    for f in report.findings:
-        title = (f.rule_id or "").replace("_", " ").title() or "Finding"
-        lines.append(f"## {title}")
-        lines.append(f"- **Result:** {'PASS' if f.passed else 'FAIL'}")
-        lines.append(f"- **Details:** {f.details}")
-        if getattr(f, "citations", None):
-            lines.append("- **Citations:**")
-            for c in f.citations:
-                quote = (c.quote or "").replace("\r", " ").replace("\n", " ").strip()
-                if len(quote) > 420:
-                    quote = quote[:420] + "…"
-                lines.append(f"  - chars [{c.char_start}-{c.char_end}]: “{quote}”")
-        lines.append("")
-    return "\n".join(lines)
+# Unified rendering now handled by evaluator.py
 
 def _to_read_dto(r: RulePackRecord) -> RulePackRead:
     return RulePackRead(
@@ -165,6 +150,8 @@ def _parse_yaml_to_update(yaml_text: str) -> RulePackUpdate:
 def _startup():
     # Make sure tables exist
     init_db()
+    # Configure logging
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 @app.get("/rule-packs", response_model=List[RulePackOut])
 def get_rule_packs(status: Optional[str] = None, db: Session = Depends(get_db)):
@@ -210,7 +197,79 @@ def read_rule_pack_yaml(pack_id: str, version: int, db: Session = Depends(get_db
 
 
 @app.post("/rule-packs/import-yaml", response_model=RulePackOut)
-def import_yaml(body: ImportYamlIn, db: Session = Depends(get_db)):
+def import_yaml(
+    body: ImportYamlIn = Body(
+        ...,
+        examples={
+            "strategic_alliance": {
+                "summary": "Strategic Alliance Rule Pack",
+                "description": "Complete strategic alliance rule pack with all required fields",
+                "value": {
+                    "yaml_text": '''id: strategic_alliance_v1
+schema_version: "1.0"
+doc_type_names:
+  - "Strategic Alliance Agreement"
+  - "Alliance Agreement"
+  - "Strategic Partnership Agreement"
+jurisdiction_allowlist:
+  - "United States"
+  - "US"
+  - "Canada"
+  - "European Union"
+  - "EU"
+liability_cap:
+  max_cap_amount: 1000000.0
+  max_cap_multiplier: 1.0
+contract:
+  max_contract_value: 5000000.0
+fraud:
+  require_fraud_clause: true
+  require_liability_on_other_party: true
+prompt: |
+  Extract grounded facts from the contract text. Use exact spans (no paraphrasing).
+  Return ONLY a single JSON object with liability_cap, contract_value, fraud_clause, governing_law.
+examples:
+  - text: "Limitation of Liability: except for fraud, liability is capped at the fees paid in the twelve (12) months prior."
+    extractions:
+      - label: "liability_cap"
+        span: "liability is capped at the fees paid in the twelve (12) months prior"
+        attributes:
+          cap_multiplier: 1.0
+          carveouts: ["fraud"]
+notes: "Strategic alliance agreements focusing on partnership terms, liability limits, and fraud protection"'''
+                }
+            },
+            "employment": {
+                "summary": "Employment Agreement Rule Pack",
+                "description": "Employment contract rule pack template",
+                "value": {
+                    "yaml_text": '''id: employment_v1
+schema_version: "1.0"
+doc_type_names:
+  - "Employment Agreement"
+  - "Offer Letter"
+  - "Employment Contract"
+jurisdiction_allowlist:
+  - "United States"
+  - "Canada"
+liability_cap:
+  max_cap_amount: null
+  max_cap_multiplier: null
+contract:
+  max_contract_value: null
+fraud:
+  require_fraud_clause: false
+  require_liability_on_other_party: false
+prompt: |
+  Extract employment terms and conditions from the contract text.
+examples: []
+notes: "Employment agreements and offer letters"'''
+                }
+            }
+        }
+    ),
+    db: Session = Depends(get_db)
+):
     """
     Import YAML as a DRAFT rule pack. The YAML itself must contain 'id' and doc_type_names, etc.
     """
@@ -294,6 +353,10 @@ async def preview_run(
 ):
     try:
         raw_bytes = await file.read()
+
+        # Calculate SHA1 for logging and metadata
+        sha1_hash = hashlib.sha1(raw_bytes).hexdigest()
+
         text = ingest_bytes_to_text(raw_bytes, filename=file.filename)
 
         # Load active packs once
@@ -304,28 +367,114 @@ async def preview_run(
         by_id = {p.id: p for p in active_packs}
 
         selected_pack_id = pack_id
+        doc_type_meta = {}
+
         if not selected_pack_id:
-            # Auto-detect: pass both text and packs mapping to your guesser
-            guess = guess_doc_type_id(text, by_id)
-            selected_pack_id = guess or next(iter(by_id.keys()))
+            # Auto-detect: use enhanced detection with detailed metadata
+            from document_classifier import guess_doc_type_id_enhanced
+            detected_pack_id, candidates, selection_reason = guess_doc_type_id_enhanced(text, by_id)
+            selected_pack_id = detected_pack_id or next(iter(by_id.keys()))
+
+            # Build document type detection metadata
+            doc_type_meta = {
+                "auto_detected": True,
+                "selection_reason": selection_reason,
+                "candidates": [
+                    {
+                        "pack_id": c.pack_id,
+                        "doc_type": c.doc_type,
+                        "score": round(c.score, 2),
+                        "confidence": round(c.score / 10.0, 3),  # Normalize to 0-1
+                        "reason": c.reason
+                    }
+                    for c in candidates[:3]  # Top 3 candidates
+                ]
+            }
+        else:
+            doc_type_meta = {
+                "auto_detected": False,
+                "forced_pack_id": pack_id
+            }
 
         pack = by_id.get(selected_pack_id)
         if not pack:
             raise HTTPException(404, f"Rule pack '{selected_pack_id}' not found or not active.")
 
-        # Evaluate using the rules inside the selected pack
+        # Evaluate using the rules inside the selected pack (unified path)
+        from evaluator import make_report, render_markdown
         report = make_report(document_name=file.filename, text=text, rules=pack.rules)
-        report_md = _render_markdown_inline(report)
+        report_md = render_markdown(report)
+
+        # Create metadata for logging and response
+        meta = {
+            "filename": file.filename or "unknown",
+            "sha1": sha1_hash,
+            "selected_pack_id": selected_pack_id,
+            "pass_fail": "PASS" if report.passed_all else "FAIL",
+            "document_type_detection": doc_type_meta
+        }
+
+        # Log the processing details
+        logging.info(f"Preview run: filename={meta['filename']}, sha1={meta['sha1']}, pack_id={meta['selected_pack_id']}, result={meta['pass_fail']}")
 
         return PreviewRunOut(
             document_name=file.filename,
             pack_id=selected_pack_id,
             report_markdown=report_md,
+            meta=meta
         )
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(500, f"Preview run failed: {e}")
+
+@app.post("/preview-run.md", response_class=PlainTextResponse)
+async def preview_run_markdown(
+    file: UploadFile = File(...),
+    pack_id: Optional[str] = Form(None),
+    db: Session = Depends(get_db),
+):
+    """
+    Same as /preview-run but returns only the markdown report as text/markdown.
+    Perfect for direct download or preview in browsers.
+    """
+    try:
+        raw_bytes = await file.read()
+        sha1_hash = hashlib.sha1(raw_bytes).hexdigest()
+        text = ingest_bytes_to_text(raw_bytes, filename=file.filename)
+
+        # Load active packs
+        active_packs = load_active_rulepacks(db)
+        if not active_packs:
+            raise HTTPException(404, "No active rule packs available.")
+
+        by_id = {p.id: p for p in active_packs}
+
+        # Document type detection (same logic as JSON endpoint)
+        selected_pack_id = pack_id
+        if not selected_pack_id:
+            from document_classifier import guess_doc_type_id_enhanced
+            detected_pack_id, candidates, selection_reason = guess_doc_type_id_enhanced(text, by_id)
+            selected_pack_id = detected_pack_id or next(iter(by_id.keys()))
+
+        pack = by_id.get(selected_pack_id)
+        if not pack:
+            raise HTTPException(404, f"Rule pack '{selected_pack_id}' not found or not active.")
+
+        # Generate report
+        from evaluator import make_report, render_markdown
+        report = make_report(document_name=file.filename, text=text, rules=pack.rules)
+        report_md = render_markdown(report)
+
+        # Log for consistency
+        logging.info(f"Preview run (markdown): filename={file.filename}, sha1={sha1_hash}, pack_id={selected_pack_id}, result={'PASS' if report.passed_all else 'FAIL'}")
+
+        return PlainTextResponse(content=report_md, media_type="text/markdown")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, f"Preview run (markdown) failed: {e}")
 
 # =========================
 #  Delete a rule pack

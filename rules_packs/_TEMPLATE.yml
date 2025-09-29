@@ -1,10 +1,21 @@
-id: strategic_alliance_v1
-schema_version: "1.0"
-doc_type_names:
-  - "Strategic Alliance Agreement"
-  - "Alliance Agreement"
-  - "Strategic Partnership Agreement"
+# Standard RulePack YAML Template
+# This template defines the canonical structure that all rule packs must follow.
+# Based on the strategic_alliance.yml file which serves as the reference implementation.
 
+# REQUIRED: Unique identifier for this rule pack version
+id: template_v1
+
+# REQUIRED: Schema version for compatibility tracking
+schema_version: "1.0"
+
+# REQUIRED: List of document types this rule pack can analyze
+# These names are used for automatic document type detection
+doc_type_names:
+  - "Template Agreement"
+  - "Sample Contract"
+
+# REQUIRED: Jurisdiction configuration
+# Lists the allowed countries/jurisdictions for governing law clauses
 jurisdiction_allowlist:
   - "United States"
   - "US"
@@ -14,17 +25,35 @@ jurisdiction_allowlist:
   - "Australia"
   - "AUS"
 
+# REQUIRED: Liability cap policy configuration
 liability_cap:
+  # Maximum absolute cap amount in contract currency (null = no limit)
   max_cap_amount: 1000000.0
+  # Maximum cap as multiplier of contract value (null = no limit, 1.0 = 1x contract value)
   max_cap_multiplier: 1.0
 
+# REQUIRED: Contract value policy configuration
 contract:
+  # Maximum allowable total contract value (null = no limit)
   max_contract_value: 5000000.0
 
+# REQUIRED: Fraud clause requirements
 fraud:
+  # Whether a fraud clause/carveout is required
   require_fraud_clause: true
+  # Whether fraud liability must be assigned to the other party
   require_liability_on_other_party: true
 
+# OPTIONAL: Extended rules for specialized evaluators (future use)
+# This section allows for domain-specific rules beyond the core rule set
+rules:
+  - id: example_rule
+    type: custom.rule_type
+    params:
+      example_param: true
+
+# REQUIRED: LLM prompt for extraction (used when LLM explanations are enabled)
+# Should follow the structured format for consistent extractions
 prompt: |
   Extract grounded facts from the contract text. Use exact spans (no paraphrasing).
   Only return fields that are actually present; omit absent fields.
@@ -38,7 +67,7 @@ prompt: |
   Guidelines:
   - liability_cap: If the cap references "12 months of fees" or similar, set cap_multiplier=1.0.
   - contract_value: Extract the total/maximum contract value if explicitly stated (not every money mention).
-  - fraud_clause: Include any fraud carveout. If text assigns liability to the "other party", set liability_assignment="other"; 
+  - fraud_clause: Include any fraud carveout. If text assigns liability to the "other party", set liability_assignment="other";
     if it assigns liability to the same party, use "self"; else "unclear".
   - governing_law: Extract the governing law/jurisdiction/venue clause and identify the country/jurisdiction string.
 
@@ -71,6 +100,8 @@ prompt: |
     ]
   }
 
+# REQUIRED: Training examples for LLM extraction
+# Must include at least one example showing expected extraction format
 examples:
   - text: "Limitation of Liability: except for fraud, liability is capped at the fees paid in the twelve (12) months prior."
     extractions:
@@ -80,4 +111,16 @@ examples:
           cap_multiplier: 1.0
           carveouts: ["fraud"]
 
-notes: "Strategic alliance agreements focusing on partnership terms, liability limits, and fraud protection"
+# OPTIONAL: Additional metadata and notes
+notes: "Template rule pack demonstrating the canonical YAML structure"
+
+# OPTIONAL: Extension fields for custom rule pack features
+extensions:
+  custom_field: "value"
+
+# OPTIONAL: Schema for extension validation
+extensions_schema:
+  type: "object"
+  properties:
+    custom_field:
+      type: "string"
