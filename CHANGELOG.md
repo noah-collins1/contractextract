@@ -7,15 +7,106 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Planned
-- Enhanced LLM rationale generation
-- Multi-language document support
-- Advanced citation highlighting
-- Export compliance dashboards
-- Machine learning model integration
+- Multi-language document support (Spanish, French, German)
+- Enhanced citation highlighting with visual markers in reports
+- Export compliance dashboards with analytics
+- Advanced LLM rationale generation with chain-of-thought
+- Machine learning model integration for auto-classification
 
 ---
 
-## [1.2.1] - 2025-01-XX (Current Session)
+## [1.3.0] - 2025-01-XX (Phase 4 - Pure MCP Architecture)
+
+### Added
+- **🚀 Pure Stdio MCP Protocol**
+  - Direct stdio communication with LibreChat (no HTTP overhead)
+  - Single `mcp_server.py` file (959 lines) replacing entire MCP directory
+  - Async/await architecture for optimal performance
+  - Automatic process management via LibreChat
+
+- **📦 File Consolidation (23 → 5 Core Modules)**
+  - `infrastructure.py` - Configuration, database, schemas, telemetry (267 lines)
+  - `contract_analyzer.py` - Analysis engine with LLM integration (590 lines)
+  - `document_analysis.py` - PDF processing and document classification (514 lines)
+  - `rulepack_manager.py` - Rule pack storage and lifecycle management (313 lines)
+  - `mcp_server.py` - Pure stdio MCP server with 16 tools (959 lines)
+
+- **✨ Markdown Report Integration**
+  - `analyze_document` tool now returns full markdown report in response
+  - LibreChat can display formatted reports directly in chat
+  - Automatic markdown content extraction after file save
+  - New `markdown_report` field in JSON responses
+
+- **📝 Enhanced Documentation**
+  - Complete README.md rewrite with table of contents
+  - Documentation index with audience targeting
+  - Updated CLAUDE.md for pure MCP architecture
+  - Phase 4 consolidation tracking in FILE_MANIFEST.md
+  - Enhanced CLI prompt for LibreChat agent integration
+
+### Changed
+- **🏗️ Architecture Simplification**
+  - Removed FastAPI HTTP server (replaced by pure MCP)
+  - Removed React frontend (LibreChat provides UI)
+  - Unified Pydantic v2 environment (removed v1/v2 split)
+  - Eliminated HTTP MCP protocol (stdio only)
+  - Removed bridge services (no longer needed)
+
+- **⚙️ Environment & Dependencies**
+  - Single `requirements.txt` (Pydantic v2 + MCP SDK 1.14.1)
+  - Removed `requirements-v1.txt` and `requirements-v2.txt`
+  - Simplified virtual environment setup (`.venv` only)
+  - Updated all dependencies to latest stable versions
+
+- **📋 MCP Tools Enhancement**
+  - Consolidated tool implementations into single file
+  - Improved error handling and logging across all tools
+  - Enhanced parameter validation and type safety
+  - Better integration with consolidated modules
+
+### Removed
+- **Deprecated Components**
+  - ❌ `app.py` - FastAPI HTTP server
+  - ❌ `db.py` - Separate database module
+  - ❌ `models_rulepack.py` - SQLAlchemy models
+  - ❌ `schemas.py` - Pydantic schemas
+  - ❌ `evaluator.py` - Evaluation engine
+  - ❌ `ingest.py` - PDF ingestion
+  - ❌ `doc_type.py` - Document classification
+  - ❌ `rulepack_repo.py`, `rulepack_loader.py`, `rulepack_dtos.py` - Rule pack management
+  - ❌ `yaml_importer.py` - YAML import utilities
+  - ❌ `llm_factory.py`, `llm_provider.py` - LLM abstraction
+  - ❌ `citation_mapper.py` - Citation utilities
+  - ❌ `telemetry.py`, `settings.py` - Configuration files
+  - ❌ `bridge_client.py`, `langextract_service.py` - Bridge services
+  - ❌ `mcp_server/` directory - All MCP-related subdirectory files
+  - ❌ `front/` directory - React frontend application
+  - ❌ `librechat/` directory - Moved to config files
+
+### Fixed
+- **Performance & Reliability**
+  - Eliminated HTTP overhead with direct stdio communication
+  - Reduced import complexity and startup time
+  - Improved error handling across consolidated modules
+  - Better resource management with single process model
+
+### Migration Notes
+**Breaking Changes:**
+- FastAPI HTTP endpoints no longer available
+- React frontend removed (use LibreChat UI)
+- Dual environment setup replaced by single `.venv`
+- MCP configuration changed from HTTP to stdio protocol
+
+**Migration Path:**
+1. Delete old virtual environments (`.venv-v1`, `.venv-v2`)
+2. Create new `.venv` with `requirements.txt`
+3. Update `librechat.yaml` to use stdio protocol
+4. Remove references to `app.py` in startup scripts
+5. Use LibreChat UI instead of React frontend
+
+---
+
+## [1.2.1] - 2025-01-XX (YAML Schema & LLM Enhancements)
 
 ### Added
 - **YAML Rule Pack Schema Standardization (v1.0)**
@@ -72,19 +163,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Improved status reporting for explanation generation
   - Enhanced exception handling in LLM processing pipeline
 
-### Technical Improvements
-- **Development Workflow**
-  - Added comprehensive validation script for all YAML rule packs
-  - Created batch fixing utility for YAML standardization
-  - Improved documentation in both README.md and CLAUDE.md
-  - Enhanced file organization with clear template structure
-
-- **Code Quality**
-  - Better separation of concerns in evaluation pipeline
-  - Improved error handling throughout the system
-  - Enhanced logging for debugging and monitoring
-  - Consistent code formatting and structure
-
 ---
 
 ## [1.2.0] - 2025-01-XX (LibreChat MCP Integration)
@@ -112,12 +190,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Added `mcp_server/` directory with MCP integration
   - Enhanced FastAPI app with MCP endpoint at `/mcp`
   - Updated database schema to support MCP operations
-
-### Technical
-- **Environment Management**
-  - Separated Pydantic v1/v2 environments for compatibility
-  - Created helper scripts for environment switching
-  - Enhanced development commands and documentation
 
 ---
 
@@ -187,7 +259,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## Development Process
 
 ### Commit Message Format
-Each commit should follow this format for tracking:
 ```
 type(scope): description
 
@@ -197,40 +268,65 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
 ### Version Numbering
-- **Major (X.0.0)**: Breaking changes, major new features
-- **Minor (X.Y.0)**: New features, backward compatible
-- **Patch (X.Y.Z)**: Bug fixes, improvements, patches
+- **Major (X.0.0)**: Breaking changes, major architecture shifts
+- **Minor (X.Y.0)**: New features, backward compatible enhancements
+- **Patch (X.Y.Z)**: Bug fixes, improvements, documentation
 
-### Key Git Branches
-- `master`: Main development branch
-- Feature branches: For new capabilities and improvements
-- Release branches: For version preparation and testing
+### Key Milestones
 
-### Recent Development Sessions
-1. **API Enhancement & LLM Improvements** (Current)
-   - Enhanced API response tracking with SHA1 hashing
-   - Improved LLM explanation system with executive summaries
-   - Fixed document processing uniqueness issues
+#### **Phase 4 (v1.3.0)** - Pure MCP Architecture
+- File consolidation: 23 → 5 core modules
+- Stdio protocol migration
+- Markdown report integration
+- Complete documentation rewrite
 
-2. **YAML Schema Standardization** (Current)
-   - Created standardized schema v1.0 for all rule packs
-   - Fixed YAML syntax errors across all files
-   - Added comprehensive validation tooling
+#### **Phase 3 (v1.2.1)** - Schema & Quality
+- YAML schema standardization v1.0
+- LLM explanation enhancements
+- Report generation improvements
 
-3. **LibreChat MCP Integration** (v1.2.0)
-   - Implemented 16 MCP tools for full functionality
-   - Created dual environment support for Pydantic compatibility
-   - Enhanced development workflow and documentation
+#### **Phase 2 (v1.2.0)** - LibreChat Integration
+- 16 MCP tools implementation
+- Dual environment setup
+- Natural language rule pack editing
 
-4. **Frontend Development** (v1.1.0)
-   - Built React/TypeScript frontend application
-   - Enhanced API with comprehensive endpoints
-   - Added real-time processing capabilities
+#### **Phase 1 (v1.0-1.1)** - Foundation
+- Core analysis engine
+- React frontend
+- Database integration
 
-5. **Initial Development** (v1.0.0)
-   - Core contract analysis engine
-   - Database integration and rule pack system
-   - LLM integration and citation tracking
+---
+
+## Recent Development Sessions
+
+### **Session 5: Phase 4 Consolidation & Documentation** (Current)
+- Consolidated 23 files into 5 core modules
+- Migrated to pure stdio MCP protocol
+- Added markdown report integration
+- Rewrote all documentation for new architecture
+- Updated LibreChat CLI prompt for agent integration
+
+### **Session 4: YAML Schema & LLM Enhancements**
+- Standardized YAML schema to v1.0
+- Enhanced LLM explanation system
+- Added executive summaries to reports
+- Fixed YAML syntax errors across all rule packs
+
+### **Session 3: MCP Integration**
+- Implemented 16 MCP tools
+- Created dual environment setup
+- Built HTTP MCP endpoint
+- Enhanced rule pack lifecycle management
+
+### **Session 2: Frontend Development**
+- Built React/TypeScript frontend
+- Enhanced API with comprehensive endpoints
+- Added real-time processing updates
+
+### **Session 1: Initial Development**
+- Core contract analysis engine
+- Database integration with PostgreSQL
+- LLM integration for explanations
 
 ---
 

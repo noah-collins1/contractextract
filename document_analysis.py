@@ -1,12 +1,256 @@
 """
-Enhanced document type detection with rules-first scoring and LLM fallback.
+Consolidated Document Analysis Module
+Combines PDF ingestion, document type detection, and citation mapping.
+
+Merged from:
+- ingest.py: PDF text extraction
+- doc_type.py: Legacy document type detection
+- document_classifier.py: Enhanced document type detection with LLM fallback
+- citation_mapper.py: Page/line citation mapping
 """
 
 import re
 import json
-from typing import Dict, List, Tuple, Optional, NamedTuple
-from schemas import RulePack
-from settings import settings
+import pdfplumber
+import tempfile
+import os
+from pathlib import Path
+from typing import Dict, List, Tuple, Optional, NamedTuple, Union
+from infrastructure import RulePack, Citation, settings
+
+# Constants
+PAGE_BREAK = "\f"  # Keep page boundaries in the text
+
+# ========================================
+# PDF TEXT EXTRACTION
+# ========================================
+
+def ingest_pdfs_from_directory() -> Dict[str, str]:
+    """
+    Ingest all PDFs from the data/ directory.
+    Returns dict mapping filename (without extension) to extracted text.
+    """
+    pdf_folder = Path("data")
+    text_store = dict()
+    for pdf_path in pdf_folder.glob("*.pdf"):
+        title = pdf_path.name
+        print(f"Reading {title}...")
+        pages = []
+        with pdfplumber.open(pdf_path) as pdf:
+            for page in pdf.pages:
+                text = page.extract_text() or ""  # avoid None
+                pages.append(text.strip())
+        full_text = PAGE_BREAK.join(pages)
+        text_store[pdf_path.stem] = full_text
+    return text_store
+
+
+def ingest_bytes_to_text(data: bytes, filename: str | None = None) -> str:
+    """
+    Accept raw PDF bytes, write to a temp file, extract text with pdfplumber,
+    and return the combined string with form-feed page breaks.
+
+    Args:
+        data: Raw PDF bytes
+        filename: Optional filename for proper extension handling
+
+    Returns:
+        Extracted text with \f as page separators
+    """
+    suffix = ""
+    if filename and "." in filename:
+        suffix = "." + filename.split(".")[-1]
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+        tmp.write(data)
+        tmp_path = tmp.name
+
+    try:
+        pages = []
+        with pdfplumber.open(tmp_path) as pdf:
+            for page in pdf.pages:
+                text = page.extract_text() or ""
+                pages.append(text.strip())
+        return PAGE_BREAK.join(pages)
+    finally:
+        try:
+            os.remove(tmp_path)
+        except Exception:
+            pass
+
+
+# Alias for backward compatibility
+ingest = ingest_pdfs_from_directory
+
+# ========================================
+# CITATION MAPPING
+# ========================================
+
+class PageLineMapper:
+    """Maps character positions to page and line numbers in extracted text."""
+
+    def __init__(self, text: str):
+        """
+        Initialize mapper for a document text with page breaks.
+
+        Args:
+            text: Document text with \f as page separators
+        """
+        self.text = text
+        self.page_boundaries = self._calculate_page_boundaries()
+        self.line_boundaries = self._calculate_line_boundaries()
+
+    def _calculate_page_boundaries(self) -> List[Tuple[int, int]]:
+        """
+        Calculate character start/end positions for each page.
+
+        Returns:
+            List of (start_char, end_char) tuples for each page
+        """
+        boundaries = []
+        pages = self.text.split(PAGE_BREAK)
+        char_pos = 0
+
+        for i, page_text in enumerate(pages):
+            start_char = char_pos
+            end_char = char_pos + len(page_text)
+            boundaries.append((start_char, end_char))
+
+            # Move past the page content and the page break character (except for last page)
+            char_pos = end_char
+            if i < len(pages) - 1:  # Not the last page
+                char_pos += 1  # Account for the \f character
+
+        return boundaries
+
+    def _calculate_line_boundaries(self) -> List[List[Tuple[int, int]]]:
+        """
+        Calculate line boundaries for each page.
+
+        Returns:
+            List of pages, each containing list of (start_char, end_char) for lines
+        """
+        page_lines = []
+        pages = self.text.split(PAGE_BREAK)
+        char_pos = 0
+
+        for i, page_text in enumerate(pages):
+            lines = page_text.split('\n')
+            line_boundaries = []
+            page_char_pos = char_pos
+
+            for j, line_text in enumerate(lines):
+                start_char = page_char_pos
+                end_char = page_char_pos + len(line_text)
+                line_boundaries.append((start_char, end_char))
+
+                # Move past the line content and newline (except for last line)
+                page_char_pos = end_char
+                if j < len(lines) - 1:  # Not the last line
+                    page_char_pos += 1  # Account for the \n character
+
+            page_lines.append(line_boundaries)
+
+            # Move past the page and page break
+            char_pos = page_char_pos
+            if i < len(pages) - 1:  # Not the last page
+                char_pos += 1  # Account for the \f character
+
+        return page_lines
+
+    def char_to_page_line(self, char_start: int, char_end: int) -> Tuple[Optional[int], Optional[int], Optional[int]]:
+        """
+        Convert character positions to page and line numbers.
+
+        Args:
+            char_start: Starting character position
+            char_end: Ending character position
+
+        Returns:
+            Tuple of (page_number, line_start, line_end) (1-based) or (None, None, None) if not found
+        """
+        # Find which page contains the start position
+        page_num = None
+        for i, (page_start, page_end) in enumerate(self.page_boundaries):
+            if page_start <= char_start <= page_end:
+                page_num = i + 1  # 1-based page numbering
+                break
+
+        if page_num is None:
+            return None, None, None
+
+        # Find which lines contain the start and end positions
+        page_idx = page_num - 1  # Convert back to 0-based for array access
+        if page_idx >= len(self.line_boundaries):
+            return page_num, None, None
+
+        line_start = None
+        line_end = None
+
+        for j, (line_start_char, line_end_char) in enumerate(self.line_boundaries[page_idx]):
+            if line_start is None and line_start_char <= char_start <= line_end_char:
+                line_start = j + 1  # 1-based line numbering
+
+            if line_start_char <= char_end <= line_end_char:
+                line_end = j + 1  # 1-based line numbering
+
+        # If span crosses multiple lines but we found start, estimate end
+        if line_start is not None and line_end is None:
+            # Find the last line that overlaps with the character range
+            for j, (line_start_char, line_end_char) in enumerate(self.line_boundaries[page_idx]):
+                if line_start_char <= char_end:
+                    line_end = j + 1
+
+        return page_num, line_start, line_end
+
+    def enhance_citation(self, citation: Citation) -> Citation:
+        """
+        Enhance a citation with page and line information.
+
+        Args:
+            citation: Citation object with char_start and char_end
+
+        Returns:
+            Enhanced citation with page and line information
+        """
+        page, line_start, line_end = self.char_to_page_line(citation.char_start, citation.char_end)
+
+        # Determine confidence based on whether we found valid page/line info
+        confidence = 1.0
+        if page is None or line_start is None:
+            confidence = 0.5  # Lower confidence if we couldn't map properly
+
+        return Citation(
+            char_start=citation.char_start,
+            char_end=citation.char_end,
+            quote=citation.quote,
+            page=page,
+            line_start=line_start,
+            line_end=line_end,
+            confidence=confidence
+        )
+
+
+def enhance_citations_with_page_line(text: str, citations: List[Citation]) -> List[Citation]:
+    """
+    Enhance a list of citations with page and line information.
+
+    Args:
+        text: Document text with page breaks
+        citations: List of citations to enhance
+
+    Returns:
+        List of enhanced citations
+    """
+    if not citations:
+        return citations
+
+    mapper = PageLineMapper(text)
+    return [mapper.enhance_citation(citation) for citation in citations]
+
+
+# ========================================
+# DOCUMENT TYPE DETECTION
+# ========================================
 
 class DocTypeCandidate(NamedTuple):
     """A candidate document type with confidence score."""
@@ -14,6 +258,7 @@ class DocTypeCandidate(NamedTuple):
     doc_type: str
     score: float
     reason: str
+
 
 class DocumentClassifier:
     """Enhanced document classifier with rules-first + LLM fallback."""
@@ -253,6 +498,7 @@ Requirements:
         reason = f"heuristic_confident (score={top_candidate.score:.1f}, confidence={top_candidate.score/10.0:.2f})"
         return top_candidate.pack_id, candidates, reason
 
+
 # Global classifier instance
 _classifier = DocumentClassifier()
 
@@ -265,9 +511,52 @@ def guess_doc_type_id_enhanced(text: str, packs: Dict[str, RulePack]) -> Tuple[O
     """
     return _classifier.classify_document(text, packs)
 
+
+# ========================================
+# LEGACY COMPATIBILITY
+# ========================================
+
+def compile_title_hints(packs: Dict[str, RulePack]) -> List[Tuple[re.Pattern, str]]:
+    """Legacy function for simple regex-based document type hints."""
+    hints: List[Tuple[re.Pattern, str]] = []
+    for pack in packs.values():
+        for name in pack.doc_type_names:
+            hints.append((re.compile(rf"\b{name}\b", re.IGNORECASE), pack.id))
+    return hints
+
+
 def guess_doc_type_id(text: str, packs: Dict[str, RulePack]) -> Optional[str]:
     """
-    Legacy interface - returns just the pack ID for backward compatibility.
+    Legacy document type detection - simple regex matching.
+    Maintained for backward compatibility.
     """
-    pack_id, _, _ = _classifier.classify_document(text, packs)
-    return pack_id
+    head = (text or "")[:4000]
+    for rx, pack_id in compile_title_hints(packs):
+        if rx.search(head):
+            return pack_id
+    return None  # runner will fall back to default pack
+
+
+# ========================================
+# PUBLIC API
+# ========================================
+
+__all__ = [
+    # PDF Ingestion
+    'ingest_pdfs_from_directory',
+    'ingest_bytes_to_text',
+    'ingest',  # alias
+
+    # Citation Mapping
+    'PageLineMapper',
+    'enhance_citations_with_page_line',
+
+    # Document Classification
+    'DocumentClassifier',
+    'DocTypeCandidate',
+    'guess_doc_type_id_enhanced',
+    'guess_doc_type_id',  # legacy
+
+    # Constants
+    'PAGE_BREAK'
+]

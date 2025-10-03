@@ -221,6 +221,26 @@ actions:
   #   minRelevanceScore: 0.45
   #   # (optional) Agent Capabilities available to all users. Omit the ones you wish to exclude. Defaults to list below.
   #   capabilities: ["execute_code", "file_search", "actions", "tools"]
+mcpServers:
+  contractextract:
+    type: "stdio"
+    command: "/opt/mcp/.venv/bin/python"
+    args:
+      - "-u"
+      - "/opt/mcp/contractextract/mcp_server.py"
+    cwd: "/opt/mcp/contractextract"
+    env:
+      PYTHONPATH: "/opt/mcp/contractextract"
+      # PostgreSQL connection for contractextract database
+      DATABASE_URL: "postgresql+psycopg2://postgres:contractextract_pass@contractextract-db:5432/contractextract"
+      # Optional: User context
+      # USER_EMAIL: "{{LIBRECHAT_USER_EMAIL}}"
+      # CE_LOG_LEVEL: "INFO"
+    timeout: 60000             # per-request timeout (ms)
+    initTimeout: 150000        # startup budget (ms)
+    serverInstructions: true   # include server-provided instructions in agent context
+    stderr: "inherit"          # stream server logs to container stderr (handy for debugging)
+
 
 
 endpoints:

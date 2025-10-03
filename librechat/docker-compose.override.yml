@@ -22,14 +22,21 @@
 # ---------------------------------------------------
 
 services:
+  # Override api service: build with Python support and mount MCP code
   api:
+    build:
+      context: .
+      dockerfile: Dockerfile.librechat-python
     volumes:
       - ./librechat.yaml:/app/librechat.yaml
-        
+      - C:\Users\noahc\PycharmProjects\langextract:/opt/mcp/contractextract:ro
     environment:
-      RAG_API_URL: http://rag_api:8000
-      MEILI_HTTP_ADDR: http://meilisearch:7700
-      MONGODB_URI: mongodb://mongodb:27017/librechat
+      - HOST=0.0.0.0
+      - MONGO_URI=mongodb://mongodb:27017/LibreChat
+      - MEILI_HOST=http://meilisearch:7700
+      - RAG_PORT=${RAG_PORT:-8000}
+      - RAG_API_URL=http://rag_api:${RAG_PORT:-8000}
+      - PYTHONUNBUFFERED=1
     depends_on:
       mongodb:
         condition: service_healthy
@@ -40,8 +47,14 @@ services:
       rag_api:
         condition: service_started
         required: true
+      contractextract-db:
+        condition: service_healthy
+        required: true
 
   mongodb:
+    image: mongo:7
+    restart: unless-stopped
+    user: "" # Override UID/GID from base - let mongo use its own user
     healthcheck:
       test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 || exit 1"]
       interval: 10s
@@ -83,10 +96,27 @@ services:
         condition: service_healthy
         required: true
 
+  # PostgreSQL for ContractExtract MCP server
+  contractextract-db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: contractextract
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: contractextract_pass
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d contractextract"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - contractextract-db-data:/var/lib/postgresql/data
 
 volumes:
   mongo-data:
   meili_data:
+  contractextract-db-data:
 
 
 # # LOCAL BUILD

@@ -1,44 +1,147 @@
-# evaluator.py
-from __future__ import annotations
-from pathlib import Path
-from typing import List
-import re
-from decimal import Decimal
-import os
-import json
-from schemas import RuleSet, DocumentReport, Finding
+"""
+Consolidated Contract Analysis Engine
+Complete analysis pipeline with LLM provider support and evaluation logic.
 
-# ---- Try to import your rule evaluator; provide a safe fallback ----
+Merged from:
+- evaluator.py: Core evaluation engine with finding normalization and LLM explanations
+- llm_factory.py: LLM provider loading and configuration
+- llm_provider.py: LLM provider abstractions and implementations
+"""
+
+import os
+import yaml
+import re
+import json
+from abc import ABC, abstractmethod
+from pathlib import Path
+from typing import List, Any, Sequence
+from decimal import Decimal
+
+try:
+    import langextract as lx
+except ImportError:
+    # Fallback if langextract not available
+    lx = None
+
+from infrastructure import RuleSet, DocumentReport, Finding
+
+# ========================================
+# LLM PROVIDER ABSTRACTIONS
+# ========================================
+
+class LLMProvider(ABC):
+    """Abstract base class for LLM providers."""
+
+    @abstractmethod
+    def extract(
+        self,
+        *,
+        text_or_documents: Sequence[str] | str,
+        prompt: str,
+        examples: list[Any],
+        extraction_passes: int = 1,
+        max_workers: int = 1,
+        max_char_buffer: int = 1500,
+    ) -> Any:
+        """Extract information using the LLM provider."""
+        ...
+
+
+class OllamaProvider(LLMProvider):
+    """Ollama LLM provider implementation."""
+
+    def __init__(self, model_id="llama3:8b-instruct-q4_K_M", url="http://localhost:11434"):
+        self.model_id = model_id
+        self.url = url
+
+    def extract(self, *, text_or_documents, prompt, examples,
+                extraction_passes=1, max_workers=1, max_char_buffer=1500):
+        """Extract information using Ollama via langextract."""
+        if lx is None:
+            raise ImportError("langextract module not available")
+
+        return lx.extract(
+            text_or_documents=text_or_documents,
+            prompt_description=prompt,
+            examples=examples,
+            model_id=self.model_id,
+            model_url=self.url,
+            extraction_passes=extraction_passes,
+            max_workers=max_workers,
+            max_char_buffer=max_char_buffer,
+            fence_output=False,
+            use_schema_constraints=False,
+        )
+
+
+# ========================================
+# LLM PROVIDER FACTORY
+# ========================================
+
+def load_provider(config_path: str = "llm.yaml") -> LLMProvider:
+    """
+    Load and configure an LLM provider.
+
+    Args:
+        config_path: Path to LLM configuration file
+
+    Returns:
+        Configured LLM provider instance
+    """
+    cfg = {}
+    if os.path.exists(config_path):
+        with open(config_path, "r", encoding="utf-8") as f:
+            cfg = yaml.safe_load(f) or {}
+
+    kind = os.getenv("LLM_PROVIDER", cfg.get("provider", "ollama")).lower()
+    if kind == "ollama":
+        return OllamaProvider(
+            model_id=cfg.get("model_id", "llama3:8b-instruct-q4_K_M"),
+            url=cfg.get("model_url", "http://localhost:11434"),
+        )
+    raise ValueError(f"Unknown provider: {kind}")
+
+
+# ========================================
+# RULE EVALUATION ENGINE
+# ========================================
+
+# Import rule evaluator with fallback
 try:
     from archive.placeholder_rules_contracts import evaluate_text_against_rules
 except Exception:
     def evaluate_text_against_rules(text: str, rules: RuleSet):
-        # Fallback: no findings, no guess — keeps pipeline alive
+        """Fallback: no findings, no guess — keeps pipeline alive."""
         return ([], None)
 
-# ---- Currency-context guard (prevents "200 million shares" as money) ----
+
+# Currency and monetary context detection patterns
 _CURRENCY_HINT = re.compile(r"(\$|usd|dollar|dollars|£|gbp|€|eur|yen|¥|cad|aud)", re.I)
-_SHARE_UNIT   = re.compile(r"\b(share|shares|unit|units|warrant|warrants|option|options)\b", re.I)
-_NUMBERISH    = re.compile(r"\d")
+_SHARE_UNIT = re.compile(r"\b(share|shares|unit|units|warrant|warrants|option|options)\b", re.I)
+_NUMBERISH = re.compile(r"\d")
+
 
 def _looks_like_money(window_text: str) -> bool:
-    """Legacy helper (still used by the generic guard)."""
+    """Legacy helper for detecting monetary context."""
     if _SHARE_UNIT.search(window_text):
         return False
     return bool(_CURRENCY_HINT.search(window_text))
 
 
-# --- NEW: extra helpers for rule-aware normalization ---
-
 def _has_share_context(window: str) -> bool:
+    """Check if text window contains share/equity context."""
     return bool(_SHARE_UNIT.search(window))
 
+
 def _looks_like_money_ctx(window: str) -> bool:
-    # currency hint AND not share context
+    """Check for currency hint AND not share context."""
     return bool(_CURRENCY_HINT.search(window)) and not _has_share_context(window)
+
 
 def _maybe_guard_monetary_false_positives(text: str, findings: List[Finding]) -> List[Finding]:
     """
+    Guard against monetary false positives like share counts.
+
     If citations look numeric but lack currency context (or mention shares/units),
     flip the finding to PASS with an explanatory note — but only for monetary-ish rules.
     """
@@ -85,7 +188,6 @@ def _maybe_guard_monetary_false_positives(text: str, findings: List[Finding]) ->
     return fixed
 
 
-# --- NEW: rule-aware normalization for consistency across all packs ---
 def _normalize_findings_with_rules(text: str, rules: RuleSet, findings: List[Finding]) -> List[Finding]:
     """
     Make results consistent using rule context (applies to every rule pack):
@@ -180,8 +282,10 @@ def _normalize_findings_with_rules(text: str, rules: RuleSet, findings: List[Fin
     return out
 
 
-# --- OPTIONAL: append concise LLM rationales for failing findings (off unless enabled) ---
-import os
+# ========================================
+# LLM EXPLANATION SYSTEM
+# ========================================
+
 def _coerce_to_text(res) -> str:
     """
     Normalize common provider results into plain text:
@@ -218,7 +322,7 @@ def _coerce_to_text(res) -> str:
             for ent in res["entities"]:
                 if isinstance(ent, dict):
                     name = ent.get("name") or ent.get("label") or "Field"
-                    val  = ent.get("value") or ent.get("text") or ""
+                    val = ent.get("value") or ent.get("text") or ""
                     if isinstance(val, (list, dict)):
                         try:
                             val = json.dumps(val, ensure_ascii=False)
@@ -298,13 +402,12 @@ def _call_llm_any(provider, *, doc_text: str, prompt: str):
     return "error", "[llm error: no supported method on provider]"
 
 
-
 def _maybe_add_llm_explanations(text: str, rules: RuleSet, findings: List[Finding], max_failures: int = None, llm_override: bool = None) -> List[Finding]:
     """
     Append concise LLM rationales to failing findings. Now enabled by default.
     Always adds a status finding so it's obvious whether this step ran and which mode was used.
     """
-    from settings import settings
+    from infrastructure import settings
 
     enabled = settings.get_llm_enabled(llm_override)
     max_failures = max_failures or settings.LLM_MAX_EXPLANATIONS
@@ -317,7 +420,6 @@ def _maybe_add_llm_explanations(text: str, rules: RuleSet, findings: List[Findin
     # Load provider
     provider = None
     try:
-        from llm_factory import load_provider
         provider = load_provider()
         status.append(f"provider_loaded={bool(provider)}")
         if provider is None:
@@ -401,11 +503,10 @@ def _maybe_add_llm_explanations(text: str, rules: RuleSet, findings: List[Findin
     return findings
 
 
+# ========================================
+# MAIN ANALYSIS API
+# ========================================
 
-
-
-
-# ---- Main API ----
 def make_report(document_name: str, text: str, rules: RuleSet, llm_override: bool = None) -> DocumentReport:
     """
     Generate a compliance report for a document.
@@ -419,8 +520,8 @@ def make_report(document_name: str, text: str, rules: RuleSet, llm_override: boo
     Returns:
         DocumentReport with findings and LLM explanations
     """
-    from settings import settings
-    from citation_mapper import enhance_citations_with_page_line
+    from infrastructure import settings
+    from document_analysis import enhance_citations_with_page_line
 
     findings, _guess = evaluate_text_against_rules(text, rules) or ([], None)
     print(f"[debug] LLM explanations = {settings.get_llm_enabled(llm_override)} (default=enabled, override={llm_override})")
@@ -448,8 +549,13 @@ def make_report(document_name: str, text: str, rules: RuleSet, llm_override: boo
     passed_all = all(f.passed for f in findings)
     return DocumentReport(document_name=document_name, passed_all=passed_all, findings=findings)
 
-# ---- Markdown utilities (used by main.py) ----
+
+# ========================================
+# MARKDOWN RENDERING AND OUTPUT
+# ========================================
+
 def render_markdown(report: DocumentReport) -> str:
+    """Render a document report as Markdown."""
     lines = []
     lines.append(f"# Compliance Report — {report.document_name}")
     lines.append("")
@@ -527,11 +633,39 @@ def render_markdown(report: DocumentReport) -> str:
 
     return "\n".join(lines)
 
+
 def save_markdown(report: DocumentReport, out_dir: Path):
+    """Save report as Markdown file."""
     out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / "violations.md").write_text(render_markdown(report), encoding="utf-8")
+    (out_dir / "report.md").write_text(render_markdown(report), encoding="utf-8")
+
 
 def save_txt(report: DocumentReport, out_dir: Path):
+    """Save report as JSON files."""
     out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / "violations.txt").write_text(report.json(indent=2), encoding="utf-8")
-    (out_dir / "_eval_debug.json").write_text(report.json(indent=2), encoding="utf-8")
+    (out_dir / "report.txt").write_text(report.model_dump_json(indent=2), encoding="utf-8")
+    (out_dir / "_eval_debug.json").write_text(report.model_dump_json(indent=2), encoding="utf-8")
+
+
+# ========================================
+# PUBLIC API
+# ========================================
+
+__all__ = [
+    # LLM Providers
+    'LLMProvider',
+    'OllamaProvider',
+    'load_provider',
+
+    # Analysis Engine
+    'make_report',
+    'render_markdown',
+    'save_markdown',
+    'save_txt',
+
+    # Internal utilities (for testing/debugging)
+    '_call_llm_any',
+    '_maybe_add_llm_explanations',
+    '_normalize_findings_with_rules',
+    '_maybe_guard_monetary_false_positives',
+]

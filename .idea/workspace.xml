@@ -4,29 +4,72 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ed4ef082-8c23-4bc3-8a32-6ab63d9a8d52" name="Changes" comment="librechat MCP integration update">
-      <change afterPath="$PROJECT_DIR$/CHANGELOG.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/citation_mapper.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/document_classifier.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fix_yaml_files.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rules_packs/_TEMPLATE.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/settings.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/validate_yaml_rulepacks.py" afterDir="false" />
+    <list default="true" id="ed4ef082-8c23-4bc3-8a32-6ab63d9a8d52" name="Changes" comment="Contractexctract overhaul, quality upgrades">
+      <change afterPath="$PROJECT_DIR$/contract_analyzer.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/document_analysis.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/infrastructure.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/librechat/CLAUDE.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/librechat/CONTRACTEXTRACT_CLI_PROMPT.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/librechat/CONTRACTEXTRACT_DB_SETUP.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/librechat/MCP_STDIO_SETUP.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/librechat/mcp-requirements.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mcp_server.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rulepack_manager.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/CHANGELOG.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CLAUDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/CLAUDE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DEMO_STARTUP_CHECKLIST.md" beforeDir="false" afterPath="$PROJECT_DIR$/DEMO_STARTUP_CHECKLIST.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FILE_MANIFEST.md" beforeDir="false" afterPath="$PROJECT_DIR$/FILE_MANIFEST.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluator.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rules_packs/employment.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rules_packs/employment.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rules_packs/ip_agreement.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rules_packs/ip_agreement.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rules_packs/joint_venture.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rules_packs/joint_venture.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rules_packs/noncompete.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rules_packs/noncompete.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rules_packs/promotion.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rules_packs/promotion.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rules_packs/servicing.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rules_packs/servicing.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rules_packs/strategic_alliance.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rules_packs/strategic_alliance.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/schemas.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yaml_importer.py" beforeDir="false" afterPath="$PROJECT_DIR$/yaml_importer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap_db.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bridge_client.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/citation_mapper.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/db.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/doc_type.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/document_classifier.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluator.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fix_yaml_files.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/.env" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/public/favicon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/src/App.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/src/api/client.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/src/api/types.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/src/components/FileRow.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/src/components/Navbar.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/src/components/ReportCard.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/src/components/RulePackEditor.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/src/main.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/src/pages/Dashboard.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/src/pages/Documents.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/src/pages/RulePacks.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/src/pages/Upload.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/src/theme.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ingest.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/langextract_service.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/librechat/docker-compose.override.yml" beforeDir="false" afterPath="$PROJECT_DIR$/librechat/docker-compose.override.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/librechat/librechat.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/librechat/librechat.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/llm_factory.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llm_provider.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mcp_server/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mcp_server/direct_mcp_endpoint.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mcp_server/server.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mcp_server/tools.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models_rulepack.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements-v1.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements-v2.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rulepack_dtos.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rulepack_loader.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rulepack_repo.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rules_packs/_TEMPLATE.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rules_packs/_TEMPLATE.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/schemas.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/telemetry.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/validate_yaml_rulepacks.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/yaml_importer.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -111,11 +154,11 @@
       <recent name="C:\Users\noahc\PycharmProjects\langextract\stash\employment" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\noahc\PycharmProjects\langextract\librechat" />
       <recent name="C:\Users\noahc\PycharmProjects\langextract\data" />
       <recent name="C:\Users\noahc\PycharmProjects\langextract\stash\strategic_alliance" />
       <recent name="C:\Users\noahc\PycharmProjects\langextract\rules_packs" />
       <recent name="C:\Users\noahc\PycharmProjects\langextract\stash" />
-      <recent name="C:\Users\noahc\PycharmProjects\langextract\archive" />
     </key>
   </component>
   <component name="RunManager" selected="Python.main">
@@ -198,7 +241,8 @@
       <workItem from="1756922082494" duration="1942000" />
       <workItem from="1756924061164" duration="3156000" />
       <workItem from="1758728758354" duration="13916000" />
-      <workItem from="1758904575035" duration="15935000" />
+      <workItem from="1758904575035" duration="51662000" />
+      <workItem from="1759468915559" duration="3829000" />
     </task>
     <task id="LOCAL-00001" summary="refocused on main, local version">
       <option name="closed" value="true" />
@@ -224,7 +268,15 @@
       <option name="project" value="LOCAL" />
       <updated>1758746839561</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Contractexctract overhaul, quality upgrades">
+      <option name="closed" value="true" />
+      <created>1759115190804</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1759115190804</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -257,7 +309,8 @@
     <MESSAGE value="refocused on main, local version" />
     <MESSAGE value="librechat MCP integration" />
     <MESSAGE value="librechat MCP integration update" />
-    <option name="LAST_COMMIT_MESSAGE" value="librechat MCP integration update" />
+    <MESSAGE value="Contractexctract overhaul, quality upgrades" />
+    <option name="LAST_COMMIT_MESSAGE" value="Contractexctract overhaul, quality upgrades" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -265,11 +318,6 @@
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/archive/test.py</url>
           <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/schemas.py</url>
-          <line>1</line>
-          <option name="timeStamp" value="2" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/archive/rule_registry.py</url>
