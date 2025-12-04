@@ -34,7 +34,10 @@ llm_extraction:
   prompt: |
     You are analyzing a **SaaS Agreement** (Software as a Service, Master Subscription Agreement, or Cloud Services Agreement).
 
-    Your task is to extract key terms and facts specific to SaaS agreements. Focus on:
+    CRITICAL: You MUST return EXACTLY ONE JSON object with a SINGLE top-level property: "key_terms".
+    Inside "key_terms", you MUST use ONLY the snake_case field names listed in the schema below.
+
+    Your job is to extract SaaS-specific key terms and facts related to:
     - Service description and scope
     - Uptime/availability commitments (SLA)
     - Support terms and response times
@@ -43,16 +46,46 @@ llm_extraction:
     - Termination rights
     - Security and compliance standards
 
-    **CRITICAL CITATION REQUIREMENTS:**
-    - For each extracted field, provide the exact text span from the contract that supports it
-    - Use COMPLETE SENTENCES or COMPLETE CLAUSES - do not cut off mid-phrase
-    - If a term is not found or not applicable, use `null`
-    - Prefer direct quotes over paraphrasing
+    -------------------------------------------------------------------------------
+    ABSOLUTE FORMAT RULES (NO EXCEPTIONS)
+    -------------------------------------------------------------------------------
+    1. Your entire response MUST be EXACTLY one JSON object.
+    2. Do NOT wrap the JSON in markdown code fences. NO ```json, NO ``` at all.
+    3. Do NOT include any text before or after the JSON. No commentary, no explanations.
+       - BAD: "Here is the extracted data: {...}"
+       - GOOD: "{...}"
+    4. All keys MUST match the schema names exactly.
+    5. Use JSON booleans true / false (lowercase), not True / False.
+    6. DO NOT include trailing commas in arrays or objects.
+       - BAD: {"key": "value",}
+       - BAD: ["item1", "item2",]
+       - GOOD: {"key": "value"}
+       - GOOD: ["item1", "item2"]
+    7. DO NOT use ellipsis (...) or placeholder text.
+       - If a value is unknown, use null
+       - BAD: "value": "..."
+       - GOOD: "value": null
+    8. Output must be valid RFC 8259 JSON:
+       - No comments (// or /* */)
+       - No unquoted keys
+       - No single quotes (use double quotes)
+       - No trailing commas
+    9. Types must match exactly:
+       - Numbers as numbers (no quotes): 99.9, 12, 30
+       - Strings as strings (quoted): "30 days", "SOC 2 Type II"
+       - Booleans as true/false
+       - Use null for missing values
+    10. DO NOT quote numeric values:
+       - BAD: "uptime_commitment_percent": "99.9"
+       - BAD: "auto_renewal_term_months": "12 months"
+       - GOOD: "uptime_commitment_percent": 99.9
+       - GOOD: "auto_renewal_term_months": 12
 
-    **OUTPUT FORMAT:**
-    Respond with a single JSON object. No additional prose or explanation outside the JSON.
+    -------------------------------------------------------------------------------
+    REQUIRED JSON STRUCTURE
+    -------------------------------------------------------------------------------
+    Your response must match this EXACT structure:
 
-    JSON structure:
     {
       "key_terms": {
         "service_description": "<Brief description of the SaaS service/platform provided, or null>",
@@ -63,26 +96,100 @@ llm_extraction:
         "termination_for_convenience_days": <Numeric days notice required for termination without cause (e.g., 30) or null>,
         "customer_data_ownership": "<Statement confirming customer owns their data, or null>",
         "security_standards": "<Security certifications or standards mentioned (e.g., 'SOC 2 Type II, ISO 27001') or null>",
-        "payment_terms": "<Payment frequency and terms (e.g., 'annual in advance', 'monthly in arrears') or null>"
-      },
-      "citations": {
-        "service_description": "<Exact sentence/clause from contract or null>",
-        "uptime_commitment_percent": "<Exact sentence/clause from contract or null>",
-        "support_response_time": "<Exact sentence/clause from contract or null>",
-        "data_retention_period": "<Exact sentence/clause from contract or null>",
-        "auto_renewal_term_months": "<Exact sentence/clause from contract or null>",
-        "termination_for_convenience_days": "<Exact sentence/clause from contract or null>",
-        "customer_data_ownership": "<Exact sentence/clause from contract or null>",
-        "security_standards": "<Exact sentence/clause from contract or null>",
-        "payment_terms": "<Exact sentence/clause from contract or null>"
+        "payment_terms": "<Payment frequency and terms (e.g., 'annual in advance', 'monthly in arrears') or null>",
+        "citations": {
+          "service_description": "<Exact sentence/clause from contract or null>",
+          "uptime_commitment_percent": "<Exact sentence/clause from contract or null>",
+          "support_response_time": "<Exact sentence/clause from contract or null>",
+          "data_retention_period": "<Exact sentence/clause from contract or null>",
+          "auto_renewal_term_months": "<Exact sentence/clause from contract or null>",
+          "termination_for_convenience_days": "<Exact sentence/clause from contract or null>",
+          "customer_data_ownership": "<Exact sentence/clause from contract or null>",
+          "security_standards": "<Exact sentence/clause from contract or null>",
+          "payment_terms": "<Exact sentence/clause from contract or null>"
+        }
       }
     }
 
-    **EXAMPLE:**
-    If the contract says: "Provider guarantees 99.95% monthly uptime excluding scheduled maintenance windows."
-    Then: `uptime_commitment_percent: 99.95` and `citations.uptime_commitment_percent: "Provider guarantees 99.95% monthly uptime excluding scheduled maintenance windows."`
+    -------------------------------------------------------------------------------
+    FIELD-BY-FIELD INSTRUCTIONS
+    -------------------------------------------------------------------------------
 
-    Now extract key terms from the provided SaaS Agreement contract text.
+    - service_description: Brief description of the SaaS service/platform being provided.
+      Look for "Services", "Platform", "Software Application" sections.
+
+    - uptime_commitment_percent: Numeric uptime percentage (e.g., 99.9, 99.95, 99.99).
+      Look for "Service Level Agreement", "SLA", "Uptime", "Availability" sections.
+      Extract ONLY the number (e.g., if it says "99.95%", extract 99.95 as a number, not a string).
+
+    - support_response_time: Support response time commitment.
+      Look for "Support", "Response Time", "Service Levels" sections.
+      E.g., "4 hours for critical issues", "24-hour response time for P1 issues".
+
+    - data_retention_period: How long data is retained after termination.
+      Look for "Data Retention", "Post-Termination", "Data Deletion" sections.
+      E.g., "30 days", "90 days", "7 days".
+
+    - auto_renewal_term_months: Numeric months for auto-renewal term.
+      Look for "Renewal", "Term", "Auto-Renewal" sections.
+      Extract ONLY the number of months (e.g., if it says "12-month renewal", extract 12).
+
+    - termination_for_convenience_days: Numeric days notice required for termination without cause.
+      Look for "Termination", "Notice Period", "Cancellation" sections.
+      Extract ONLY the number of days (e.g., if it says "60 days notice", extract 60).
+
+    - customer_data_ownership: Statement confirming customer owns their data.
+      Look for "Data Ownership", "Customer Data", "Your Data" sections.
+      E.g., "Customer retains all right, title, and interest in Customer Data."
+
+    - security_standards: Security certifications or standards mentioned.
+      Look for "Security", "Compliance", "Certifications" sections.
+      E.g., "SOC 2 Type II, ISO 27001", "SOC 2 Type II certification".
+
+    - payment_terms: Payment frequency and terms.
+      Look for "Payment", "Fees", "Billing" sections.
+      E.g., "annual in advance", "monthly in arrears", "annual subscription fees payable within 30 days".
+
+    CITATIONS (NO PARAPHRASING - EXACT TEXT ONLY):
+
+    - For each field you populate, add exact text snippets to citations.
+    - Each citation value is a STRING (not an array).
+    - Each string must be copied EXACTLY from the document (word-for-word).
+    - Do NOT paraphrase, summarize, or modify citation text.
+    - Use COMPLETE SENTENCES or COMPLETE CLAUSES - do not cut off mid-phrase.
+    - If you can't find exact text for a field, use null.
+
+    Examples:
+    - Good citation: "Provider guarantees 99.95% monthly uptime excluding scheduled maintenance windows."
+    - Bad citation: "Provider guarantees high uptime" (paraphrased)
+    - Good citation: "Customer retains all right, title, and interest in Customer Data."
+    - Bad citation: "Customer owns their data" (paraphrased)
+
+    -------------------------------------------------------------------------------
+    FINAL CHECKLIST
+    -------------------------------------------------------------------------------
+    Before outputting your JSON, verify:
+    ✓ No markdown code fences (no ```)
+    ✓ No text before or after the JSON (no "Here is...", no explanations)
+    ✓ Valid JSON syntax:
+      - NO trailing commas anywhere (check every object)
+      - All strings use double quotes
+      - All keys are quoted
+      - No comments
+    ✓ Single top-level object with "key_terms" key only
+    ✓ All field names in snake_case
+    ✓ Numeric fields are numbers (not strings):
+      - uptime_commitment_percent: 99.9 (not "99.9")
+      - auto_renewal_term_months: 12 (not "12" or "12 months")
+      - termination_for_convenience_days: 60 (not "60" or "60 days")
+    ✓ String fields are strings:
+      - data_retention_period: "30 days" (not 30)
+      - support_response_time: "4 hours for critical issues" (not 4)
+    ✓ Citations contains exact text snippets (not paraphrased)
+    ✓ All null values use lowercase null (not "null", "None", or "N/A")
+
+    CRITICAL: Your response must be parseable by Python's json.loads() without any preprocessing.
+    Test your JSON mentally before outputting - no trailing commas, no markdown, no prose.
 
   response_schema:
     type: object

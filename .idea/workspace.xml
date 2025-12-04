@@ -4,17 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ed4ef082-8c23-4bc3-8a32-6ab63d9a8d52" name="Changes" comment="Contractexctract overhaul, quality upgrades">
-      <change beforePath="$PROJECT_DIR$/.idea/langextract.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/langextract.iml" afterDir="false" />
+    <list default="true" id="ed4ef082-8c23-4bc3-8a32-6ab63d9a8d52" name="Changes" comment="Document Analyzer v2">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CLAUDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/CLAUDE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/contract_analyzer.py" beforeDir="false" afterPath="$PROJECT_DIR$/contract_analyzer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/document_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/document_analysis.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure.py" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mcp_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/mcp_server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rulepack_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/rulepack_manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rules_packs/strategic_alliance.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rules_packs/strategic_alliance.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -196,7 +187,7 @@
       <workItem from="1763749746921" duration="5125000" />
       <workItem from="1764092020951" duration="47496000" />
       <workItem from="1764743047260" duration="34666000" />
-      <workItem from="1764820155801" duration="17567000" />
+      <workItem from="1764820155801" duration="18643000" />
     </task>
     <task id="LOCAL-00001" summary="refocused on main, local version">
       <option name="closed" value="true" />
@@ -230,7 +221,23 @@
       <option name="project" value="LOCAL" />
       <updated>1759115190804</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Document Analyzer v2">
+      <option name="closed" value="true" />
+      <created>1764841727949</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1764841727949</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Document Analyzer v2">
+      <option name="closed" value="true" />
+      <created>1764841859302</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1764841859302</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -271,7 +278,8 @@
     <MESSAGE value="librechat MCP integration" />
     <MESSAGE value="librechat MCP integration update" />
     <MESSAGE value="Contractexctract overhaul, quality upgrades" />
-    <option name="LAST_COMMIT_MESSAGE" value="Contractexctract overhaul, quality upgrades" />
+    <MESSAGE value="Document Analyzer v2" />
+    <option name="LAST_COMMIT_MESSAGE" value="Document Analyzer v2" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -296,7 +304,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/langextract$main.coverage" NAME="main Coverage Results" MODIFIED="1756920324419" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/langextract$bootstrap_db.coverage" NAME="bootstrap_db Coverage Results" MODIFIED="1756873387909" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/mcp_server_py$http_bridge.coverage" NAME="http_bridge Coverage Results" MODIFIED="1764840837429" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/mcp_server_py$http_bridge.coverage" NAME="http_bridge Coverage Results" MODIFIED="1764841530883" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/strategic_alliance_yml$main.coverage" NAME="main Coverage Results" MODIFIED="1759114511837" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/mcp_server_py$fix.coverage" NAME="fix Coverage Results" MODIFIED="1764746317426" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
