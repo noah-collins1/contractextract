@@ -140,6 +140,15 @@ class RulePackRead(BaseModel):
 
 def _to_read(r: RulePackRecord) -> RulePackRead:
     """Convert database record to read DTO."""
+    # Try to parse examples, but skip if malformed
+    examples = []
+    if r.llm_examples_json:
+        try:
+            examples = [ExampleItem.parse_obj(x) for x in r.llm_examples_json]
+        except Exception:
+            # Skip malformed examples (common in legacy v1.0 rulepacks)
+            examples = []
+
     return RulePackRead(
         id=r.id,
         version=r.version,
@@ -149,7 +158,7 @@ def _to_read(r: RulePackRecord) -> RulePackRead:
         rules=RuleSet.parse_obj(r.ruleset_json or {}),
         rules_json=list(r.rules_json or []),
         llm_prompt=r.llm_prompt,
-        examples=[ExampleItem.parse_obj(x) for x in (r.llm_examples_json or [])],
+        examples=examples,
         extensions=r.extensions_json,
         extensions_schema=r.extensions_schema_json,
         raw_yaml=r.raw_yaml,
@@ -159,13 +168,40 @@ def _to_read(r: RulePackRecord) -> RulePackRead:
 
 
 def _to_runtime(r: RulePackRecord) -> RuntimeRulePack:
-    """Convert database record to runtime rule pack."""
+    """
+    Convert database record to runtime rule pack.
+
+    BUGFIX: Transform examples to match LangExtract library expectations.
+    LangExtract requires `extraction_text` and `extraction_class` fields,
+    but our YAML uses `span` and `label`.
+    """
+    # Transform examples to add extraction_text and extraction_class fields
+    examples_json = r.llm_examples_json or []
+    transformed_examples = []
+
+    for ex_item in examples_json:
+        ex_copy = dict(ex_item)
+        if 'extractions' in ex_copy:
+            fixed_extractions = []
+            for extraction in ex_copy['extractions']:
+                ext_copy = dict(extraction)
+                # BUGFIX: Add extraction_text from span for LangExtract compatibility
+                if 'span' in ext_copy and 'extraction_text' not in ext_copy:
+                    ext_copy['extraction_text'] = ext_copy['span']
+                # BUGFIX: Add extraction_class from label for LangExtract compatibility
+                if 'label' in ext_copy and 'extraction_class' not in ext_copy:
+                    ext_copy['extraction_class'] = ext_copy['label']
+                fixed_extractions.append(ext_copy)
+            ex_copy['extractions'] = fixed_extractions
+        transformed_examples.append(ex_copy)
+
     return RuntimeRulePack(
         id=r.id,
         doc_type_names=list(r.doc_type_names or []),
         rules=RuleSet.parse_obj(r.ruleset_json or {}),
         prompt=r.llm_prompt or "",
-        examples=[ExampleItem.parse_obj(x) for x in (r.llm_examples_json or [])],
+        examples=[ExampleItem.parse_obj(x) for x in transformed_examples],
+        rules_json=list(r.rules_json or []),  # BUGFIX (Task 3a): Include custom lease rules
     )
 
 
@@ -306,6 +342,49 @@ def load_active_rulepacks(db: Session) -> List[RuntimeRulePack]:
     return [_to_runtime(r) for r in rows]
 
 
+def load_active_v2_rulepacks_from_db(db: Session) -> Dict[str, Dict]:
+    """
+    Load active v2.0 rulepacks from database in same format as load_all_v2_rulepacks().
+
+    Returns:
+        Dict mapping rulepack_id to full rulepack data (YAML structure)
+    """
+    import yaml
+
+    q = select(RulePackRecord).where(
+        RulePackRecord.status == "active",
+        RulePackRecord.schema_version == "2.0"
+    )
+    rows = db.execute(q).scalars().all()
+
+    rulepacks = {}
+    for r in rows:
+        # If raw_yaml is stored, use it (most accurate)
+        if r.raw_yaml:
+            try:
+                rulepack_data = yaml.safe_load(r.raw_yaml)
+                rulepacks[r.id] = rulepack_data
+                continue
+            except Exception:
+                pass  # Fall through to reconstruction
+
+        # Otherwise, reconstruct from extensions (where v2.0 data is stored)
+        if r.extensions_json and "key_terms" in r.extensions_json:
+            rulepack_data = {
+                "id": r.id,
+                "schema_version": r.schema_version,
+                "doc_type_names": r.doc_type_names or [],
+                "llm_extraction": r.extensions_json.get("llm_extraction", {}),
+                "key_terms": r.extensions_json.get("key_terms", []),
+                "rules": r.rules_json or [],
+                "classification_hints": r.extensions_json.get("classification_hints", {}),
+                "examples": r.extensions_json.get("examples", []),
+            }
+            rulepacks[r.id] = rulepack_data
+
+    return rulepacks
+
+
 # ========================================
 # RUNTIME LOADING HELPERS
 # ========================================
@@ -341,7 +420,10 @@ def select_pack_for_text(db: Session, text: str) -> RuntimeRulePack:
 
 def import_rulepack_yaml(db: Session, yaml_text: str, created_by: str | None = None) -> RulePackRead:
     """
-    Import a rule pack from YAML text.
+    Import a rule pack from YAML text. Supports both schema v1.0 and v2.0.
+
+    Schema v1.0: jurisdiction_allowlist, liability_cap, contract, fraud
+    Schema v2.0: llm_extraction, key_terms, rules
 
     Args:
         db: Database session
@@ -352,29 +434,72 @@ def import_rulepack_yaml(db: Session, yaml_text: str, created_by: str | None = N
         Created draft rule pack
     """
     raw = yaml.safe_load(yaml_text) or {}
+    schema_version = raw.get("schema_version", "1.0")
 
-    # Expected keys (mirror your current YAML loader structure)
-    # id, doc_type_names, jurisdiction_allowlist, liability_cap, contract, fraud, prompt, examples
-    rules = RuleSet(
-        jurisdiction={"allowed_countries": raw.get("jurisdiction_allowlist", [])},
-        liability_cap=raw.get("liability_cap", {}) or {},
-        contract=raw.get("contract", {}) or {},
-        fraud=raw.get("fraud", {}) or {},
-    )
+    # Handle v2.0 schema (Phase 2 rulepacks)
+    if schema_version == "2.0":
+        # v2.0 schema doesn't use RuleSet - store structure in rules_json
+        # Create empty RuleSet as placeholder
+        rules = RuleSet(
+            jurisdiction={"allowed_countries": []},
+            liability_cap={},
+            contract={},
+            fraud={},
+        )
 
-    examples_yaml = raw.get("examples", []) or []
-    examples = [ExampleItem.parse_obj(e) for e in examples_yaml]
+        # Store v2.0 structure in rules_json
+        rules_json = raw.get("rules", []) or []
+
+        # Extract LLM prompt from llm_extraction section
+        llm_extraction = raw.get("llm_extraction", {}) or {}
+        llm_prompt = llm_extraction.get("prompt") or None
+
+        # Store key_terms, llm_extraction, and examples in extensions for later use
+        # Note: v2.0 examples have different format, store raw in extensions
+        extensions = {
+            "key_terms": raw.get("key_terms", []),
+            "llm_extraction": llm_extraction,
+            "classification_hints": raw.get("classification_hints", {}),
+            "examples": raw.get("examples", []),  # Store raw v2.0 examples
+        }
+
+        # Don't try to parse v2.0 examples as ExampleItem (different format)
+        examples = []
+
+    # Handle v1.0 schema (legacy rulepacks)
+    else:
+        rules = RuleSet(
+            jurisdiction={"allowed_countries": raw.get("jurisdiction_allowlist", [])},
+            liability_cap=raw.get("liability_cap", {}) or {},
+            contract=raw.get("contract", {}) or {},
+            fraud=raw.get("fraud", {}) or {},
+        )
+
+        # Try to parse examples, but don't fail if they're malformed
+        examples_yaml = raw.get("examples", []) or []
+        examples = []
+        if examples_yaml:
+            try:
+                examples = [ExampleItem.parse_obj(e) for e in examples_yaml]
+            except Exception as e:
+                # Skip malformed examples, just log and continue
+                import logging
+                logging.warning(f"Skipping malformed examples in {raw.get('id', 'unknown')}: {e}")
+                examples = []
+
+        rules_json = raw.get("rules", []) or []
+        llm_prompt = raw.get("prompt") or None
+        extensions = raw.get("extensions")
 
     payload = RulePackCreate(
         id=raw["id"],
-        schema_version=raw.get("schema_version", "1.0"),
+        schema_version=schema_version,
         doc_type_names=raw.get("doc_type_names", []) or [],
         rules=rules,
-        llm_prompt=raw.get("prompt") or None,
+        llm_prompt=llm_prompt,
         examples=examples,
-        # optional
-        rules_json=raw.get("rules", []) or [],
-        extensions=raw.get("extensions"),
+        rules_json=rules_json,
+        extensions=extensions,
         extensions_schema=raw.get("extensions_schema"),
         raw_yaml=yaml_text,
         created_by=created_by,
@@ -478,6 +603,124 @@ def validate_rulepack_structure(yaml_text: str) -> Dict[str, Any]:
 
 
 # ========================================
+# SCHEMA V2.0 SUPPORT
+# ========================================
+
+def load_rulepack_v2_from_file(file_path: str) -> Dict[str, Any]:
+    """
+    Load a schema v2.0 rulepack from a YAML file.
+
+    Args:
+        file_path: Path to YAML file
+
+    Returns:
+        Parsed rulepack dictionary with v2.0 structure
+
+    Raises:
+        FileNotFoundError: If file doesn't exist
+        ValueError: If schema_version is not "2.0"
+    """
+    import os
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Rulepack file not found: {file_path}")
+
+    with open(file_path, 'r', encoding='utf-8') as f:
+        data = yaml.safe_load(f)
+
+    if not data:
+        raise ValueError(f"Empty YAML file: {file_path}")
+
+    schema_version = data.get("schema_version", "1.0")
+    if schema_version != "2.0":
+        raise ValueError(f"Expected schema_version '2.0', got '{schema_version}' in {file_path}")
+
+    # Validate required v2.0 fields
+    required_fields = ["id", "doc_type_names", "llm_extraction", "key_terms", "rules"]
+    missing = [f for f in required_fields if f not in data]
+    if missing:
+        raise ValueError(f"Missing required v2.0 fields in {file_path}: {', '.join(missing)}")
+
+    return data
+
+
+def load_all_v2_rulepacks(directory: str = "rules_packs") -> Dict[str, Dict[str, Any]]:
+    """
+    Load all schema v2.0 rulepacks from a directory.
+
+    Args:
+        directory: Directory containing YAML files (default: "rules_packs")
+
+    Returns:
+        Dictionary mapping rulepack_id -> rulepack_data
+    """
+    import os
+    import glob
+
+    rulepacks = {}
+    yaml_files = glob.glob(os.path.join(directory, "*.yaml")) + glob.glob(os.path.join(directory, "*.yml"))
+
+    for file_path in yaml_files:
+        try:
+            data = yaml.safe_load(open(file_path, 'r', encoding='utf-8'))
+            if data and data.get("schema_version") == "2.0":
+                rulepack_id = data.get("id")
+                if rulepack_id:
+                    rulepacks[rulepack_id] = data
+        except Exception as e:
+            # Log but don't fail - skip invalid files
+            print(f"Warning: Failed to load rulepack from {file_path}: {e}")
+
+    return rulepacks
+
+
+def select_rulepack_for_doc_type(
+    classified_type: Optional[str],
+    available_rulepacks: Optional[Dict[str, Dict[str, Any]]] = None,
+    override_rulepack_id: Optional[str] = None
+) -> Optional[str]:
+    """
+    Select the best rulepack ID for a given document type.
+
+    Args:
+        classified_type: Document type from phase 1 classification
+        available_rulepacks: Dict of rulepack_id -> rulepack_data (if None, loads from rules_packs/)
+        override_rulepack_id: Force selection of specific rulepack (for demos/testing)
+
+    Returns:
+        Selected rulepack ID, or None if no match found
+    """
+    # Allow explicit override
+    if override_rulepack_id:
+        return override_rulepack_id
+
+    # Load available rulepacks if not provided
+    if available_rulepacks is None:
+        available_rulepacks = load_all_v2_rulepacks()
+
+    if not classified_type or not available_rulepacks:
+        return None
+
+    classified_lower = classified_type.lower()
+
+    # Try to match classified_type against doc_type_names in each rulepack
+    for rulepack_id, rulepack_data in available_rulepacks.items():
+        doc_type_names = rulepack_data.get("doc_type_names", [])
+        for doc_type_name in doc_type_names:
+            if doc_type_name.lower() in classified_lower or classified_lower in doc_type_name.lower():
+                return rulepack_id
+
+    # Fallback: check classification_hints keywords
+    for rulepack_id, rulepack_data in available_rulepacks.items():
+        hints = rulepack_data.get("classification_hints", {})
+        keywords = hints.get("keywords", [])
+        for keyword in keywords:
+            if keyword.lower() in classified_lower:
+                return rulepack_id
+
+    return None
+
+
+# ========================================
 # PUBLIC API
 # ========================================
 
@@ -509,6 +752,11 @@ __all__ = [
     'import_rulepack_yaml',
     'export_rulepack_to_yaml',
     'validate_rulepack_structure',
+
+    # Schema V2.0 Support
+    'load_rulepack_v2_from_file',
+    'load_all_v2_rulepacks',
+    'select_rulepack_for_doc_type',
 
     # Utility Functions
     '_to_read',

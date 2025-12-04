@@ -3,10 +3,16 @@ Consolidated Document Analysis Module
 Combines PDF ingestion, document type detection, and citation mapping.
 
 Merged from:
-- ingest.py: PDF text extraction
+- ingest.py: PDF text extraction (with OCR support)
 - doc_type.py: Legacy document type detection
 - document_classifier.py: Enhanced document type detection with LLM fallback
 - citation_mapper.py: Page/line citation mapping
+
+OCR Support:
+- Automatic scanned PDF detection via is_scanned_pdf()
+- OCR extraction using PyMuPDF + Tesseract via extract_text_with_ocr()
+- Smart extraction with extract_text_with_pages() (auto-detects and uses OCR if needed)
+- All ingestion functions automatically use OCR when scanned PDFs are detected
 """
 
 import re
@@ -14,12 +20,32 @@ import json
 import pdfplumber
 import tempfile
 import os
+import io
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional, NamedTuple, Union
 from infrastructure import RulePack, Citation, settings
 
+try:
+    import fitz  # PyMuPDF
+    from PIL import Image
+    import pytesseract
+
+    # Auto-configure Tesseract path on Windows
+    if os.name == 'nt':  # Windows
+        default_tesseract_path = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+        if os.path.exists(default_tesseract_path):
+            pytesseract.pytesseract.tesseract_cmd = default_tesseract_path
+
+    OCR_AVAILABLE = True
+except ImportError:
+    OCR_AVAILABLE = False
+    fitz = None
+    Image = None
+    pytesseract = None
+
 # Constants
 PAGE_BREAK = "\f"  # Keep page boundaries in the text
+OCR_THRESHOLD = 100  # Minimum characters to consider PDF as text-based (not scanned)
 
 # ========================================
 # PDF TEXT EXTRACTION
@@ -27,7 +53,7 @@ PAGE_BREAK = "\f"  # Keep page boundaries in the text
 
 def ingest_pdfs_from_directory() -> Dict[str, str]:
     """
-    Ingest all PDFs from the data/ directory.
+    Ingest all PDFs from the data/ directory with automatic OCR detection.
     Returns dict mapping filename (without extension) to extracted text.
     """
     pdf_folder = Path("data")
@@ -35,19 +61,15 @@ def ingest_pdfs_from_directory() -> Dict[str, str]:
     for pdf_path in pdf_folder.glob("*.pdf"):
         title = pdf_path.name
         print(f"Reading {title}...")
-        pages = []
-        with pdfplumber.open(pdf_path) as pdf:
-            for page in pdf.pages:
-                text = page.extract_text() or ""  # avoid None
-                pages.append(text.strip())
-        full_text = PAGE_BREAK.join(pages)
+        # Use smart extraction (auto-detects scanned PDFs)
+        full_text = extract_text_with_pages(str(pdf_path))
         text_store[pdf_path.stem] = full_text
     return text_store
 
 
 def ingest_bytes_to_text(data: bytes, filename: str | None = None) -> str:
     """
-    Accept raw PDF bytes, write to a temp file, extract text with pdfplumber,
+    Accept raw PDF bytes, write to a temp file, extract text with automatic OCR detection,
     and return the combined string with form-feed page breaks.
 
     Args:
@@ -65,12 +87,8 @@ def ingest_bytes_to_text(data: bytes, filename: str | None = None) -> str:
         tmp_path = tmp.name
 
     try:
-        pages = []
-        with pdfplumber.open(tmp_path) as pdf:
-            for page in pdf.pages:
-                text = page.extract_text() or ""
-                pages.append(text.strip())
-        return PAGE_BREAK.join(pages)
+        # Use smart extraction with OCR detection
+        return extract_text_with_pages(tmp_path)
     finally:
         try:
             os.remove(tmp_path)
@@ -80,6 +98,117 @@ def ingest_bytes_to_text(data: bytes, filename: str | None = None) -> str:
 
 # Alias for backward compatibility
 ingest = ingest_pdfs_from_directory
+
+
+def is_scanned_pdf(pdf_path: str, threshold: int = OCR_THRESHOLD) -> bool:
+    """
+    Detect if a PDF is scanned (image-based) or text-based.
+
+    Args:
+        pdf_path: Path to the PDF file
+        threshold: Minimum number of characters to consider as text-based
+
+    Returns:
+        True if PDF appears to be scanned (needs OCR), False if text-based
+    """
+    try:
+        # First try with pdfplumber to extract text
+        with pdfplumber.open(pdf_path) as pdf:
+            # Check first 3 pages for text content
+            pages_to_check = min(3, len(pdf.pages))
+            total_chars = 0
+
+            for i in range(pages_to_check):
+                text = pdf.pages[i].extract_text() or ""
+                total_chars += len(text.strip())
+
+            # If we have very little text, it's likely scanned
+            return total_chars < threshold
+
+    except Exception as e:
+        print(f"Error detecting PDF type: {e}")
+        # If pdfplumber fails, assume it might need OCR
+        return True
+
+
+def extract_text_with_ocr(pdf_path: str, lang: str = 'eng') -> str:
+    """
+    Extract text from a scanned PDF using OCR (PyMuPDF + Tesseract).
+
+    Args:
+        pdf_path: Path to the PDF file
+        lang: Tesseract language code (default: 'eng')
+
+    Returns:
+        Extracted text with page breaks
+    """
+    if not OCR_AVAILABLE:
+        raise ImportError(
+            "OCR libraries not available. Install with: "
+            "pip install PyMuPDF Pillow pytesseract"
+        )
+
+    print(f"Using OCR to extract text from scanned PDF: {pdf_path}")
+
+    # Open the PDF with PyMuPDF
+    pdf_document = fitz.open(pdf_path)
+    pages = []
+
+    # Process each page
+    for page_num in range(len(pdf_document)):
+        print(f"  OCR processing page {page_num + 1}/{len(pdf_document)}...")
+
+        # Get the page
+        page = pdf_document[page_num]
+
+        # Convert page to image with higher resolution for better OCR
+        # 2.0 matrix = 2x resolution (better quality)
+        mat = fitz.Matrix(2.0, 2.0)
+        pix = page.get_pixmap(matrix=mat)
+
+        # Convert pixmap to PIL Image
+        img_data = pix.tobytes("png")
+        img = Image.open(io.BytesIO(img_data))
+
+        # Perform OCR on the image
+        text = pytesseract.image_to_string(img, lang=lang)
+        pages.append(text.strip())
+
+        # Clean up
+        pix = None
+
+    # Close the document
+    pdf_document.close()
+
+    # Join pages with PAGE_BREAK character
+    return PAGE_BREAK.join(pages)
+
+
+def extract_text_with_pages(pdf_path: str) -> str:
+    """
+    Extract text from PDF with automatic scanned PDF detection.
+    Uses OCR if the PDF is scanned, otherwise uses normal text extraction.
+
+    Args:
+        pdf_path: Path to the PDF file
+
+    Returns:
+        Extracted text with page breaks (\\f separators)
+    """
+    # Check if PDF is scanned
+    if OCR_AVAILABLE and is_scanned_pdf(pdf_path):
+        # Use OCR for scanned PDFs
+        return extract_text_with_ocr(pdf_path)
+    else:
+        # Use normal text extraction for text-based PDFs
+        print(f"Extracting text from text-based PDF: {pdf_path}")
+        pages = []
+        with pdfplumber.open(pdf_path) as pdf:
+            for page in pdf.pages:
+                text = page.extract_text() or ""
+                pages.append(text.strip())
+        return PAGE_BREAK.join(pages)
+
 
 # ========================================
 # CITATION MAPPING
@@ -542,10 +671,13 @@ def guess_doc_type_id(text: str, packs: Dict[str, RulePack]) -> Optional[str]:
 # ========================================
 
 __all__ = [
-    # PDF Ingestion
+    # PDF Ingestion (with OCR support)
     'ingest_pdfs_from_directory',
     'ingest_bytes_to_text',
     'ingest',  # alias
+    'extract_text_with_pages',  # Smart extraction with OCR detection
+    'extract_text_with_ocr',  # Manual OCR extraction
+    'is_scanned_pdf',  # Scanned PDF detection
 
     # Citation Mapping
     'PageLineMapper',
@@ -558,5 +690,7 @@ __all__ = [
     'guess_doc_type_id',  # legacy
 
     # Constants
-    'PAGE_BREAK'
+    'PAGE_BREAK',
+    'OCR_THRESHOLD',
+    'OCR_AVAILABLE'
 ]

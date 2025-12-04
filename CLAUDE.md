@@ -156,6 +156,61 @@ postgresql+psycopg2://postgres:password@localhost:5432/contractextract
 - **Extensions**: Support for custom rule types and metadata
 - **Validation**: Automatic schema compliance checking
 
+### Exposing PostgreSQL Port (Optional - For Local Development)
+
+If you want to access LibreChat's PostgreSQL from your local machine (useful for debugging, pgAdmin, seeding database, etc.), you can expose the port.
+
+**Steps:**
+
+1. **Create or edit `docker-compose.override.yml`** in your LibreChat directory:
+
+```yaml
+# docker-compose.override.yml
+version: '3.4'
+
+services:
+  contractextract-db:
+    ports:
+      - "5433:5432"  # Expose on port 5433 to avoid conflict with local PostgreSQL
+```
+
+Note: Using port `5433` to avoid conflicts if you have PostgreSQL running locally on `5432`.
+
+2. **Restart LibreChat:**
+
+```powershell
+docker-compose down
+docker-compose up -d
+```
+
+3. **Verify port is exposed:**
+
+```powershell
+docker ps | findstr contractextract-db
+# Should show: 0.0.0.0:5433->5432/tcp
+```
+
+4. **Connect from local machine:**
+
+```powershell
+# Example: Seed database from local machine
+cd C:\Users\noahc\PycharmProjects\langextract
+.\.venv\Scripts\Activate.ps1
+
+# Set DATABASE_URL to exposed port
+$env:DATABASE_URL="postgresql+psycopg2://postgres:contractextract_pass@localhost:5433/contractextract"
+
+# Run seed or other database scripts
+python seed_database.py
+```
+
+5. **Connect with pgAdmin (Optional):**
+   - **Host:** localhost
+   - **Port:** 5433
+   - **Database:** contractextract
+   - **User:** postgres
+   - **Password:** contractextract_pass
+
 ## File Structure (Post-Consolidation)
 
 ```

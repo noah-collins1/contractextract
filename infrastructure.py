@@ -7,7 +7,7 @@ import os
 import sys
 import logging
 import warnings
-from typing import List, Optional
+from typing import List, Optional, Dict
 from decimal import Decimal
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
@@ -47,6 +47,10 @@ class ContractExtractSettings:
 
     # Legacy Bridge Configuration
     USE_V1_BRIDGE: bool = os.getenv("USE_V1_BRIDGE", "0") == "1"
+
+    # Report Version Configuration
+    # V2 uses the new 8-section markdown template with enhanced metadata and risk assessment
+    USE_REPORT_V2: bool = os.getenv("USE_REPORT_V2", "true").lower() in ("1", "true", "yes", "on")
 
     @classmethod
     def get_llm_enabled(cls, override: Optional[bool] = None) -> bool:
@@ -171,15 +175,296 @@ class Finding(BaseModel):
     # Optional metadata for future-proofing (not required by current pipeline)
     tags: List[str] = Field(default_factory=list)
 
+class LeaseExtraction(BaseModel):
+    """Structured lease agreement data extraction."""
+    # Property Information
+    property_name: Optional[str] = None
+    property_address: Optional[str] = None
+    property_type: Optional[str] = None
+    property_square_footage: Optional[str] = None
+    property_zoning: Optional[str] = None
+
+    # Tenant Information
+    tenant_legal_name: Optional[str] = None
+    tenant_trade_name: Optional[str] = None
+    tenant_address: Optional[str] = None
+    tenant_contact_person: Optional[str] = None
+    tenant_phone: Optional[str] = None
+    tenant_email: Optional[str] = None
+
+    # Landlord Information
+    landlord_legal_name: Optional[str] = None
+    landlord_address: Optional[str] = None
+    landlord_contact_person: Optional[str] = None
+    landlord_phone: Optional[str] = None
+    landlord_email: Optional[str] = None
+
+    # Important Dates
+    lease_commencement_date: Optional[str] = None
+    lease_expiration_date: Optional[str] = None
+    lease_term_months: Optional[str] = None
+    rent_commencement_date: Optional[str] = None
+    option_to_renew_deadline: Optional[str] = None
+    notice_to_vacate_days: Optional[str] = None
+
+    # Rent and Financial Terms
+    base_rent_amount: Optional[str] = None
+    base_rent_frequency: Optional[str] = None
+    rent_increase_percentage: Optional[str] = None
+    rent_increase_frequency: Optional[str] = None
+    cam_charges_monthly: Optional[str] = None
+    cam_charges_annual: Optional[str] = None
+    real_estate_tax_responsibility: Optional[str] = None
+    insurance_responsibility: Optional[str] = None
+    utilities_responsibility: Optional[str] = None
+
+    # Security and Deposits
+    security_deposit_amount: Optional[str] = None
+    security_deposit_held_by: Optional[str] = None
+    additional_deposit_amount: Optional[str] = None
+    deposit_return_days: Optional[str] = None
+
+    # Options and Rights
+    option_to_renew_terms: Optional[str] = None
+    option_to_expand: Optional[str] = None
+    right_of_first_refusal: Optional[str] = None
+    sublease_allowed: Optional[str] = None
+    assignment_allowed: Optional[str] = None
+
+    # Use and Restrictions
+    permitted_use: Optional[str] = None
+    prohibited_uses: Optional[str] = None
+    exclusive_use_clause: Optional[str] = None
+    operating_hours: Optional[str] = None
+    signage_rights: Optional[str] = None
+
+    # Maintenance and Repairs
+    landlord_maintenance_obligations: Optional[str] = None
+    tenant_maintenance_obligations: Optional[str] = None
+    structural_repair_responsibility: Optional[str] = None
+    hvac_maintenance_responsibility: Optional[str] = None
+
+    # Insurance and Liability
+    general_liability_coverage_required: Optional[str] = None
+    property_insurance_required: Optional[str] = None
+    additional_insured_requirement: Optional[str] = None
+
+    # Default and Termination
+    default_notice_days: Optional[str] = None
+    cure_period_days: Optional[str] = None
+    late_payment_grace_period: Optional[str] = None
+    late_payment_penalty: Optional[str] = None
+    early_termination_rights: Optional[str] = None
+
+    # Special Provisions
+    force_majeure_clause: Optional[str] = None
+    casualty_damage_provisions: Optional[str] = None
+    condemnation_provisions: Optional[str] = None
+    estoppel_certificate_requirement: Optional[str] = None
+    subordination_clause: Optional[str] = None
+
+    # Parking and Access
+    parking_spaces_allocated: Optional[str] = None
+    parking_type: Optional[str] = None
+    common_area_access: Optional[str] = None
+
 class DocumentReport(BaseModel):
     document_name: str
     passed_all: bool
     findings: List[Finding]
+    extraction: Optional[LeaseExtraction] = None
+    report_v2: Optional['DocumentReportV2'] = None  # Temporary migration field for Phase 3
+
+
+# ==================== REPORT V2 MODELS ====================
+# New structured report format with preliminary extraction, risk assessment,
+# and enhanced formatting for LibreChat MCP integration
+
+class PreliminaryExtraction(BaseModel):
+    """
+    Base fields extracted from every document, regardless of document type.
+    These are universal extractions that appear in Section 3 of Report V2.
+    """
+    document_type: str = Field(default="Unknown", description="Classified document type (from classify_document_type)")
+    parties_summary: str = Field(default="Not identified", description="Human-readable summary of parties involved")
+    duration: str = Field(default="Not specified", description="Contract length/duration summary")
+    fees_summary: str = Field(default="Not specified", description="Fees and payment terms summary")
+    termination_summary: str = Field(default="Not specified", description="Termination conditions summary")
+    jurisdiction: str = Field(default="Not specified", description="Jurisdiction/governing law extracted")
+    citations: List[Citation] = Field(default_factory=list, description="Citations supporting these extractions")
+
+
+class ComplianceCheckResult(BaseModel):
+    """
+    Result of a single preliminary compliance check.
+    Maps to Section 4 (Preliminary Compliance Checks) in Report V2.
+    """
+    check_id: str = Field(description="Unique ID for this check (e.g., 'jurisdiction_allowed')")
+    label: str = Field(description="Human-readable label (e.g., 'Jurisdiction allowed')")
+    status: str = Field(description="Status: PASS, FAIL, WARN, INFO")
+    severity: str = Field(default="Medium", description="Severity: Critical, High, Medium, Low")
+    message: str = Field(description="Human-readable details/explanation")
+    citations: List[Citation] = Field(default_factory=list, description="Citations supporting this check")
+
+    # Short and detailed explanations (for LLM-generated analysis)
+    reason_short: Optional[str] = Field(default=None, description="1-2 sentence summary (for tables, bullets)")
+    reason_detailed: Optional[str] = Field(default=None, description="Full paragraph explanation (for Section 7)")
+
+
+class RulepackRuleResult(BaseModel):
+    """
+    Result of evaluating a single rule from a document-specific rulepack.
+    Maps to Section 5.2 (Detailed Rules) table rows in Report V2.
+    """
+    rule_id: str = Field(description="Unique rule ID (e.g., 'lease.property')")
+    label: str = Field(description="Human-readable rule label")
+    category: str = Field(default="General", description="Rule category (e.g., 'Dates', 'Financial', 'Compliance')")
+    status: str = Field(description="Status: PASS, FAIL, WARN, INFO")
+    severity: str = Field(default="Medium", description="Severity: Critical, High, Medium, Low")
+    message: str = Field(description="Human-readable result details")
+    citations: List[Citation] = Field(default_factory=list, description="Citations supporting this rule")
+    risk_statement: Optional[str] = Field(default=None, description="Pre-written risk statement from YAML")
+    recommendation: Optional[str] = Field(default=None, description="Pre-written recommendation from YAML")
+
+    # Short and detailed explanations (for LLM-generated analysis)
+    reason_short: Optional[str] = Field(default=None, description="1-2 sentence summary (for tables, bullets)")
+    reason_detailed: Optional[str] = Field(default=None, description="Full paragraph explanation (for Section 7)")
+
+
+class RulepackSummary(BaseModel):
+    """
+    Summary statistics for rulepack evaluation.
+    Maps to Section 5.1 (Summary) in Report V2.
+    """
+    rulepack_id: str = Field(description="Rulepack identifier (e.g., 'lease_agreement_v1')")
+    rulepack_name: str = Field(description="Human-readable rulepack name")
+    total_rules: int = Field(default=0, description="Total rules evaluated")
+    pass_count: int = Field(default=0, description="Number of rules that passed")
+    fail_count: int = Field(default=0, description="Number of rules that failed")
+    warn_count: int = Field(default=0, description="Number of warnings")
+    info_count: int = Field(default=0, description="Number of informational findings")
+
+
+class RiskAssessment(BaseModel):
+    """
+    Overall risk assessment and recommendations for the document.
+    Maps to Section 7 (Risks & Recommendations) in Report V2.
+    """
+    overall_risk_level: str = Field(default="Unknown", description="Overall risk: Low, Medium, High, Critical")
+    top_risks: List[str] = Field(default_factory=list, description="Top 3-5 risks (rule-based + LLM-generated)")
+    recommendations: List[str] = Field(default_factory=list, description="Top 3-5 recommendations (legacy format)")
+    recommendations_per_check: Dict[str, str] = Field(default_factory=dict, description="LLM-generated recommendations mapped to check_id")
+    risk_calculation_method: str = Field(default="Hybrid", description="How risk was calculated: Explicit, Count-based, Weighted, Hybrid")
+
+
+class ExtractedKeyTerms(BaseModel):
+    """
+    Document-specific key terms extracted based on rulepack.
+    Maps to Section 6 (Extracted Key Terms) in Report V2.
+    This is flexible - different rulepacks populate different fields.
+    """
+    model_config = {'extra': 'allow'}  # Allow rulepack-specific fields
+
+    # Common fields (may or may not be populated depending on doc type)
+    property_address: Optional[str] = None
+    lease_term: Optional[str] = None
+    base_rent: Optional[str] = None
+    salary: Optional[str] = None
+    role_title: Optional[str] = None
+    non_compete_duration: Optional[str] = None
+    # ... more fields can be added dynamically by rulepacks
+
+
+class DocumentMetadata(BaseModel):
+    """
+    Document metadata for Section 1 in Report V2.
+    """
+    file_name: str = Field(description="Original file name")
+    document_id: Optional[str] = Field(default=None, description="Unique document identifier")
+    classified_type: str = Field(description="Document type from classification")
+    rulepack_id: str = Field(description="Rulepack ID used for analysis")
+    rulepack_name: str = Field(description="Human-readable rulepack name")
+    analysis_timestamp: str = Field(description="ISO timestamp of analysis")
+
+
+class DocumentReportV2(BaseModel):
+    """
+    Version 2 of the document analysis report with enhanced structure.
+
+    This is the top-level container for all report data and maps directly
+    to the 8-section report template:
+
+    1. Document Metadata
+    2. Executive Summary
+    3. Preliminary Extraction (Base Fields)
+    4. Preliminary Compliance Checks
+    5. Rulepack Evaluation
+    6. Extracted Key Terms
+    7. Risks & Recommendations
+    8. Appendix: Citations
+
+    Usage:
+        report = DocumentReportV2(
+            metadata=DocumentMetadata(...),
+            preliminary_extraction=PreliminaryExtraction(...),
+            compliance_checks=[...],
+            rulepack_summary=RulepackSummary(...),
+            rulepack_rules=[...],
+            risk_assessment=RiskAssessment(...),
+            extracted_key_terms=ExtractedKeyTerms(...),
+        )
+
+        markdown = render_markdown_v2(report)
+    """
+    # Section 1: Metadata
+    metadata: DocumentMetadata
+
+    # Section 2: Executive Summary (generated from risk_assessment)
+    executive_summary: Optional[str] = Field(default=None, description="Brief summary paragraph")
+
+    # Section 3: Preliminary Extraction
+    preliminary_extraction: PreliminaryExtraction
+
+    # Section 4: Preliminary Compliance Checks
+    compliance_checks: List[ComplianceCheckResult] = Field(default_factory=list)
+
+    # Section 5: Rulepack Evaluation
+    rulepack_summary: RulepackSummary
+    rulepack_rules: List[RulepackRuleResult] = Field(default_factory=list)
+
+    # Section 6: Extracted Key Terms (rulepack-specific)
+    extracted_key_terms: Optional[ExtractedKeyTerms] = None
+
+    # Section 7: Risks & Recommendations
+    risk_assessment: RiskAssessment
+
+    # Section 8: Citation Map (all citations consolidated)
+    citation_map: dict = Field(default_factory=dict, description="Map of citation_id -> citation text")
+
+    # Overall status
+    passed_all: bool = Field(description="True if all checks passed")
+
 
 # ---------- RulePack / Examples ----------
 class ExampleExtraction(BaseModel):
+    """
+    Schema for example extractions compatible with LangExtract library.
+
+    The LangExtract library expects these specific fields:
+    - extraction_text: The text that was extracted
+    - extraction_class: The type/category of the extraction (same as label)
+    - label: The type/category of the extraction
+    - span: Optional location information
+
+    BUGFIX: LangExtract dynamically adds fields like 'token_interval' during processing.
+    We allow extra fields to prevent validation errors.
+    """
+    model_config = {'extra': 'allow'}  # Allow LangExtract to add dynamic fields
+
+    extraction_text: str  # BUGFIX: LangExtract requires this field
+    extraction_class: str  # BUGFIX: LangExtract requires this field (same as label)
     label: str
-    span: str
+    span: Optional[str] = None
     attributes: dict = Field(default_factory=dict)
 
 class ExampleItem(BaseModel):
@@ -192,6 +477,7 @@ class RulePack(BaseModel):
     rules: RuleSet = RuleSet()
     prompt: str = ""
     examples: List[ExampleItem] = Field(default_factory=list)
+    rules_json: List[dict] = Field(default_factory=list)  # BUGFIX (Task 3a): Custom lease rules
 
 # ==================== TELEMETRY ====================
 

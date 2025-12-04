@@ -14,11 +14,14 @@ starlette==0.27.0
 
 # Database
 sqlalchemy==2.0.36
-psycopg2-binary==2.9.20
+psycopg2-binary==2.9.11
 
 # Document Processing
 pdfplumber==0.11.6
 PyYAML==6.0.2
+PyMuPDF==1.24.14
+Pillow==11.3.0
+pytesseract==0.3.13
 
 # LLM and AI
 google-genai==1.30.0

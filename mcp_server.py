@@ -269,7 +269,16 @@ async def call_tool(name: str, arguments: Dict[str, Any] | None = None) -> List[
             raise ValueError(f"Unknown tool: {name}")
 
         # Format result as TextContent
-        result_text = json.dumps(result, indent=2, default=str)
+        # For analyze_document, return markdown directly for better LibreChat display
+        if name == "analyze_document" and isinstance(result, dict) and "markdown_report" in result:
+            markdown = result["markdown_report"]
+            summary = f"**Analysis Complete: {result['overall_result']}**\n\n"
+            summary += f"Violations: {result['violation_count']} | Total Findings: {result['total_findings']}\n\n"
+            summary += "---\n\n"
+            result_text = summary + markdown
+        else:
+            result_text = json.dumps(result, indent=2, default=str)
+
         log.info(f"MCP stdio call_tool: {name} completed successfully")
         return [TextContent(type="text", text=result_text)]
 
@@ -311,8 +320,8 @@ async def handle_list_active_rulepacks() -> List[Dict[str, Any]]:
         for pack_id, pack in packs_dict.items():
             version = getattr(pack, 'version', 1)
             result.append({
-                "name": pack_id,
-                "version": str(version),
+                "id": pack_id,
+                "version": int(version),
                 "doc_type_names": list(getattr(pack, 'doc_type_names', []))
             })
         log.info(f"MCP list_active_rulepacks: found {len(result)} active packs")
@@ -605,10 +614,22 @@ async def handle_delete_rulepack(args: Dict[str, Any]) -> Dict[str, Any]:
 
 async def handle_analyze_document(args: Dict[str, Any]) -> Dict[str, Any]:
     """Analyze a contract document using rule packs."""
+
+    # DEBUG: Log incoming arguments to track file uploads
+    log.info("=" * 60)
+    log.info("ANALYZE_DOCUMENT TOOL CALLED")
+    log.info(f"Args received: {json.dumps(args, indent=2, default=str)}")
+    log.info(f"  document_path: {args.get('document_path')}")
+    log.info(f"  document_text length: {len(args.get('document_text', '')) if args.get('document_text') else 0}")
+    log.info(f"  doc_type_hint: {args.get('doc_type_hint')}")
+    log.info(f"  pack_id: {args.get('pack_id')}")
+    log.info("=" * 60)
+
     document_path = args.get("document_path")
     document_text = args.get("document_text")
     doc_type_hint = args.get("doc_type_hint")
     pack_id_hint = args.get("pack_id")
+    source_filename = args.get("source_filename")  # BUGFIX: Accept original filename
 
     # Derive text from input
     text = None
@@ -622,7 +643,12 @@ async def handle_analyze_document(args: Dict[str, Any]) -> Dict[str, Any]:
         with open(path_obj, 'rb') as f:
             raw_bytes = f.read()
         text = ingest_bytes_to_text(raw_bytes, filename=path_obj.name)
-        document_name = path_obj.stem
+
+        # BUGFIX: Use source_filename if provided (original name), else fall back to temp path stem
+        if source_filename:
+            document_name = Path(source_filename).stem
+        else:
+            document_name = path_obj.stem
 
     elif document_text:
         text = document_text
@@ -668,10 +694,12 @@ async def handle_analyze_document(args: Dict[str, Any]) -> Dict[str, Any]:
         out_dir.mkdir(parents=True, exist_ok=True)
 
         # Run standard analysis
+        # BUGFIX (Task 3a): Pass pack_data to enable custom lease rule evaluation
         report = make_report(
             document_name=document_name,
             text=text,
-            rules=selected_pack.rules
+            rules=selected_pack.rules,
+            pack_data=selected_pack  # Contains rules_json for custom lease rules
         )
 
         # Save artifacts
@@ -760,10 +788,12 @@ async def handle_preview_document_analysis(args: Dict[str, Any]) -> Dict[str, An
         selected_pack = packs_dict[selected_pack_id]
 
         # Run analysis
+        # BUGFIX (Task 3a): Pass pack_data to enable custom lease rule evaluation
         report = make_report(
             document_name="preview",
             text=document_text,
-            rules=selected_pack.rules
+            rules=selected_pack.rules,
+            pack_data=selected_pack  # Contains rules_json for custom lease rules
         )
 
         # Build summary results
@@ -919,11 +949,23 @@ async def handle_validate_rulepack_yaml(args: Dict[str, Any]) -> Dict[str, Any]:
 
 async def handle_get_system_info() -> Dict[str, Any]:
     """Get system information for debugging and monitoring."""
+
+    # DEBUG: Log database connection info
+    import os
+    from infrastructure import settings, DATABASE_URL
+    log.info(f"DEBUG: Current working directory: {os.getcwd()}")
+    log.info(f"DEBUG: Database URL being used: {DATABASE_URL}")
+    log.info(f"DEBUG: Settings DATABASE_URL: {settings.DATABASE_URL}")
+    log.info(f"DEBUG: DATABASE_URL env var: {os.getenv('DATABASE_URL', 'NOT SET')}")
+
     with SessionLocal() as db:
         total_packs = db.query(RulePackRecord).count()
         active_packs = db.query(RulePackRecord).filter(RulePackRecord.status == "active").count()
         draft_packs = db.query(RulePackRecord).filter(RulePackRecord.status == "draft").count()
         deprecated_packs = db.query(RulePackRecord).filter(RulePackRecord.status == "deprecated").count()
+
+        # DEBUG: Log query results
+        log.info(f"DEBUG: Query results - total:{total_packs}, active:{active_packs}, draft:{draft_packs}, deprecated:{deprecated_packs}")
 
     outputs_dir = Path("outputs")
     outputs_size = sum(f.stat().st_size for f in outputs_dir.rglob('*') if f.is_file()) if outputs_dir.exists() else 0
@@ -965,6 +1007,14 @@ async def main():
     try:
         init_db()
         log.info("Database initialized successfully")
+
+        # Log report version configuration
+        from infrastructure import settings
+        log.info(f"Report Version: V2 Renderer = {settings.USE_REPORT_V2}")
+        if settings.USE_REPORT_V2:
+            log.info("Using new 8-section markdown template with enhanced metadata")
+        else:
+            log.info("Using legacy markdown renderer")
     except Exception as e:
         log.error(f"Database initialization failed: {e}")
         # Continue anyway - some operations may still work

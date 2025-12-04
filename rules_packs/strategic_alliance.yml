@@ -70,6 +70,9 @@ prompt: |
       }
     ]
   }
+  
+  
+  
 
 examples:
   - text: "Limitation of Liability: except for fraud, liability is capped at the fees paid in the twelve (12) months prior."
