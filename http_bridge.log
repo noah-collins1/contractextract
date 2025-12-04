@@ -1,0 +1,12 @@
+2025-12-01 23:32:52,311 - contractextract.http_bridge - INFO - ============================================================
+2025-12-01 23:32:52,311 - contractextract.http_bridge - INFO - ContractExtract HTTP Bridge Server
+2025-12-01 23:32:52,311 - contractextract.http_bridge - INFO - Exposes MCP tools as REST API endpoints
+2025-12-01 23:32:52,311 - contractextract.http_bridge - INFO - Frontend: http://localhost:5173
+2025-12-01 23:32:52,311 - contractextract.http_bridge - INFO - API Docs: http://localhost:8000/docs
+2025-12-01 23:32:52,311 - contractextract.http_bridge - INFO - ============================================================
+INFO:     Started server process [46072]
+INFO:     Waiting for application startup.
+2025-12-01 23:32:52,355 - contractextract.http_bridge - INFO - Starting ContractExtract HTTP Bridge Server...
+2025-12-01 23:32:52,418 - contractextract.http_bridge - INFO - Database initialized successfully
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)

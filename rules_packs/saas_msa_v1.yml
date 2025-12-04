@@ -1,0 +1,338 @@
+id: "saas_msa_v1"
+schema_version: "2.0"
+doc_type_names:
+  - "SaaS Agreement"
+  - "Software as a Service Agreement"
+  - "Master Subscription Agreement"
+  - "Cloud Services Agreement"
+  - "Subscription Services Agreement"
+
+classification_hints:
+  keywords:
+    - "software as a service"
+    - "SaaS"
+    - "subscription"
+    - "cloud-based"
+    - "hosted services"
+    - "platform access"
+    - "uptime"
+    - "service level agreement"
+    - "SLA"
+  negative_keywords:
+    - "statement of work"
+    - "SOW"
+    - "deliverables"
+    - "lease of premises"
+    - "employment"
+    - "purchase order"
+
+llm_extraction:
+  description: >
+    Extract SaaS-specific key terms and facts related to service levels,
+    subscription terms, data handling, and operational commitments.
+
+  prompt: |
+    You are analyzing a **SaaS Agreement** (Software as a Service, Master Subscription Agreement, or Cloud Services Agreement).
+
+    Your task is to extract key terms and facts specific to SaaS agreements. Focus on:
+    - Service description and scope
+    - Uptime/availability commitments (SLA)
+    - Support terms and response times
+    - Data ownership, retention, and portability
+    - Subscription and renewal terms
+    - Termination rights
+    - Security and compliance standards
+
+    **CRITICAL CITATION REQUIREMENTS:**
+    - For each extracted field, provide the exact text span from the contract that supports it
+    - Use COMPLETE SENTENCES or COMPLETE CLAUSES - do not cut off mid-phrase
+    - If a term is not found or not applicable, use `null`
+    - Prefer direct quotes over paraphrasing
+
+    **OUTPUT FORMAT:**
+    Respond with a single JSON object. No additional prose or explanation outside the JSON.
+
+    JSON structure:
+    {
+      "key_terms": {
+        "service_description": "<Brief description of the SaaS service/platform provided, or null>",
+        "uptime_commitment_percent": <Numeric uptime percentage (e.g., 99.9) or null>,
+        "support_response_time": "<Support response time commitment (e.g., '4 hours for critical issues') or null>",
+        "data_retention_period": "<How long data is retained after termination (e.g., '30 days') or null>",
+        "auto_renewal_term_months": <Numeric months for auto-renewal term (e.g., 12) or null>,
+        "termination_for_convenience_days": <Numeric days notice required for termination without cause (e.g., 30) or null>,
+        "customer_data_ownership": "<Statement confirming customer owns their data, or null>",
+        "security_standards": "<Security certifications or standards mentioned (e.g., 'SOC 2 Type II, ISO 27001') or null>",
+        "payment_terms": "<Payment frequency and terms (e.g., 'annual in advance', 'monthly in arrears') or null>"
+      },
+      "citations": {
+        "service_description": "<Exact sentence/clause from contract or null>",
+        "uptime_commitment_percent": "<Exact sentence/clause from contract or null>",
+        "support_response_time": "<Exact sentence/clause from contract or null>",
+        "data_retention_period": "<Exact sentence/clause from contract or null>",
+        "auto_renewal_term_months": "<Exact sentence/clause from contract or null>",
+        "termination_for_convenience_days": "<Exact sentence/clause from contract or null>",
+        "customer_data_ownership": "<Exact sentence/clause from contract or null>",
+        "security_standards": "<Exact sentence/clause from contract or null>",
+        "payment_terms": "<Exact sentence/clause from contract or null>"
+      }
+    }
+
+    **EXAMPLE:**
+    If the contract says: "Provider guarantees 99.95% monthly uptime excluding scheduled maintenance windows."
+    Then: `uptime_commitment_percent: 99.95` and `citations.uptime_commitment_percent: "Provider guarantees 99.95% monthly uptime excluding scheduled maintenance windows."`
+
+    Now extract key terms from the provided SaaS Agreement contract text.
+
+  response_schema:
+    type: object
+    properties:
+      key_terms:
+        type: object
+        properties:
+          service_description: {type: string, nullable: true}
+          uptime_commitment_percent: {type: number, nullable: true}
+          support_response_time: {type: string, nullable: true}
+          data_retention_period: {type: string, nullable: true}
+          auto_renewal_term_months: {type: number, nullable: true}
+          termination_for_convenience_days: {type: number, nullable: true}
+          customer_data_ownership: {type: string, nullable: true}
+          security_standards: {type: string, nullable: true}
+          payment_terms: {type: string, nullable: true}
+      citations:
+        type: object
+        properties:
+          service_description: {type: string, nullable: true}
+          uptime_commitment_percent: {type: string, nullable: true}
+          support_response_time: {type: string, nullable: true}
+          data_retention_period: {type: string, nullable: true}
+          auto_renewal_term_months: {type: string, nullable: true}
+          termination_for_convenience_days: {type: string, nullable: true}
+          customer_data_ownership: {type: string, nullable: true}
+          security_standards: {type: string, nullable: true}
+          payment_terms: {type: string, nullable: true}
+
+key_terms:
+  - name: service_description
+    json_path: $.key_terms.service_description
+    label: "Service Description"
+    description: "High-level description of the SaaS services being provided."
+    type: string
+
+  - name: uptime_commitment_percent
+    json_path: $.key_terms.uptime_commitment_percent
+    label: "Uptime Commitment (%)"
+    description: "Numeric uptime commitment percentage (e.g., 99.9)."
+    type: number
+
+  - name: support_response_time
+    json_path: $.key_terms.support_response_time
+    label: "Support Response Time"
+    description: "Committed support response time for critical issues."
+    type: string
+
+  - name: data_retention_period
+    json_path: $.key_terms.data_retention_period
+    label: "Data Retention Period"
+    description: "Duration customer data is retained after termination."
+    type: string
+
+  - name: auto_renewal_term_months
+    json_path: $.key_terms.auto_renewal_term_months
+    label: "Auto-Renewal Term (Months)"
+    description: "Length of automatic renewal term in months."
+    type: number
+
+  - name: termination_for_convenience_days
+    json_path: $.key_terms.termination_for_convenience_days
+    label: "Termination Notice Period (Days)"
+    description: "Days of notice required to terminate without cause."
+    type: number
+
+  - name: customer_data_ownership
+    json_path: $.key_terms.customer_data_ownership
+    label: "Customer Data Ownership"
+    description: "Statement confirming customer ownership of their data."
+    type: string
+
+  - name: security_standards
+    json_path: $.key_terms.security_standards
+    label: "Security Standards"
+    description: "Security certifications or standards provider complies with."
+    type: string
+
+  - name: payment_terms
+    json_path: $.key_terms.payment_terms
+    label: "Payment Terms"
+    description: "Payment frequency and timing (e.g., annual in advance)."
+    type: string
+
+rules:
+  - id: saas.uptime_minimum
+    label: "Uptime Commitment Meets Minimum"
+    category: "Service Levels"
+    severity: "High"
+    description: "Verify that uptime commitment meets or exceeds 99.9% (three nines)."
+    condition: "uptime_commitment_percent is not None and uptime_commitment_percent >= 99.9"
+    failure_message: "Uptime commitment is below 99.9% or not specified."
+    success_message: "Uptime commitment meets or exceeds 99.9%."
+    risk_statement: "Low uptime commitments expose the customer to unacceptable service downtime, potentially disrupting business operations."
+    recommendation: "Negotiate for at least 99.9% uptime. For mission-critical services, consider 99.95% or 99.99% with strong SLA credits."
+
+  - id: saas.auto_renewal_reasonable
+    label: "Auto-Renewal Term Reasonable"
+    category: "Term & Renewal"
+    severity: "Medium"
+    description: "Ensure auto-renewal term is 12 months or less to avoid long lock-in."
+    condition: "auto_renewal_term_months is None or auto_renewal_term_months <= 12"
+    failure_message: "Auto-renewal term exceeds 12 months, creating extended lock-in risk."
+    success_message: "Auto-renewal term is 12 months or less, or not specified."
+    risk_statement: "Long auto-renewal periods can lock the customer into unfavorable terms without opportunity to renegotiate or switch providers."
+    recommendation: "Reduce auto-renewal term to 12 months or less, or require explicit written consent for renewal beyond 12 months."
+
+  - id: saas.termination_flexibility
+    label: "Termination for Convenience Allowed"
+    category: "Term & Termination"
+    severity: "Medium"
+    description: "Check that customer can terminate for convenience with reasonable notice."
+    condition: "termination_for_convenience_days is not None and termination_for_convenience_days <= 90"
+    failure_message: "Termination for convenience requires more than 90 days notice or is not allowed."
+    success_message: "Customer can terminate for convenience with 90 days or less notice."
+    risk_statement: "Inability to terminate or long notice periods trap the customer in the agreement even if service quality degrades or business needs change."
+    recommendation: "Negotiate termination for convenience with 30-60 days notice. If termination is only for cause, add clear performance metrics that trigger termination rights."
+
+  - id: saas.customer_data_ownership
+    label: "Customer Data Ownership Confirmed"
+    category: "Data Rights"
+    severity: "High"
+    description: "Verify that customer ownership of their data is explicitly stated."
+    condition: "customer_data_ownership is not None and len(customer_data_ownership) > 0"
+    failure_message: "Customer data ownership is not clearly stated."
+    success_message: "Contract explicitly confirms customer owns their data."
+    risk_statement: "Ambiguous data ownership can lead to disputes over data rights, portability, and usage after termination."
+    recommendation: "Add explicit clause: 'Customer retains all right, title, and interest in and to Customer Data.' Ensure data portability rights are clearly defined."
+
+  - id: saas.data_retention_specified
+    label: "Data Retention Period Specified"
+    category: "Data Rights"
+    severity: "Medium"
+    description: "Ensure post-termination data retention period is clearly defined."
+    condition: "data_retention_period is not None and len(data_retention_period) > 0"
+    failure_message: "Post-termination data retention period is not specified."
+    success_message: "Post-termination data retention period is clearly specified."
+    risk_statement: "Unclear data retention policies can result in unexpected data deletion or indefinite retention, raising compliance concerns."
+    recommendation: "Specify a reasonable retention period (e.g., 30-90 days) with clear data export and deletion procedures upon request."
+
+  - id: saas.security_standards_present
+    label: "Security Standards Documented"
+    category: "Security & Compliance"
+    severity: "Medium"
+    description: "Check that provider commits to recognized security standards."
+    condition: "security_standards is not None and len(security_standards) > 0"
+    failure_message: "No security standards or certifications are documented."
+    success_message: "Provider commits to recognized security standards/certifications."
+    risk_statement: "Absence of documented security standards increases risk of data breaches and regulatory non-compliance."
+    recommendation: "Require provider to maintain SOC 2 Type II, ISO 27001, or equivalent certifications. Include audit rights and breach notification provisions."
+
+examples:
+  - text: |
+      MASTER SUBSCRIPTION AGREEMENT
+
+      This Agreement governs Customer's access to the CloudPlatform SaaS solution.
+
+      1. Services. Provider shall provide Customer with access to the CloudPlatform software application, hosted on Provider's infrastructure, 24 hours per day, 7 days per week.
+
+      2. Service Level. Provider guarantees 99.95% monthly uptime, calculated monthly, excluding scheduled maintenance windows not to exceed 4 hours per month.
+
+      3. Support. Provider will provide email support with a 4-hour response time for critical (P1) issues and 24-hour response time for non-critical issues during business hours (9am-5pm ET, Monday-Friday).
+
+      4. Term and Renewal. Initial term is 12 months. This Agreement automatically renews for successive 12-month terms unless either party provides 60 days written notice of non-renewal.
+
+      5. Data. Customer retains all right, title, and interest in Customer Data. Upon termination, Provider will retain Customer Data for 30 days, after which it will be permanently deleted unless Customer requests earlier deletion.
+
+      6. Security. Provider maintains SOC 2 Type II certification and complies with ISO 27001 standards.
+
+      7. Fees. Customer will pay annual subscription fees in advance within 30 days of invoice date.
+
+    extractions:
+      key_terms:
+        service_description: "access to the CloudPlatform software application, hosted on Provider's infrastructure"
+        uptime_commitment_percent: 99.95
+        support_response_time: "4-hour response time for critical (P1) issues"
+        data_retention_period: "30 days"
+        auto_renewal_term_months: 12
+        termination_for_convenience_days: 60
+        customer_data_ownership: "Customer retains all right, title, and interest in Customer Data."
+        security_standards: "SOC 2 Type II certification and complies with ISO 27001 standards"
+        payment_terms: "annual subscription fees in advance within 30 days of invoice date"
+
+  - text: |
+      SOFTWARE AS A SERVICE AGREEMENT
+
+      Provider agrees to provide Customer with hosted access to the AnalyticsPro platform.
+
+      Service Availability: Provider will use commercially reasonable efforts to maintain service availability of at least 99.5% measured quarterly.
+
+      This agreement has an initial 24-month term and will automatically renew for additional 24-month periods. Either party may terminate upon 90 days written notice at the end of any term.
+
+      Customer acknowledges that Provider owns all rights to the platform and any aggregated, anonymized data derived from Customer's use.
+
+      Fees are payable monthly in arrears via automatic credit card charge.
+
+    extractions:
+      key_terms:
+        service_description: "hosted access to the AnalyticsPro platform"
+        uptime_commitment_percent: 99.5
+        support_response_time: null
+        data_retention_period: null
+        auto_renewal_term_months: 24
+        termination_for_convenience_days: 90
+        customer_data_ownership: null
+        security_standards: null
+        payment_terms: "monthly in arrears via automatic credit card charge"
+
+  - text: |
+      CLOUD SERVICES SUBSCRIPTION TERMS
+
+      These terms govern your use of our cloud-based collaboration suite.
+
+      We strive to maintain high availability but make no specific uptime guarantees.
+
+      Your subscription will continue on a month-to-month basis until you cancel through your account settings.
+
+      Upon cancellation, your data will be immediately inaccessible and deleted within 7 days.
+
+      You are responsible for maintaining backups of your data.
+
+    extractions:
+      key_terms:
+        service_description: "cloud-based collaboration suite"
+        uptime_commitment_percent: null
+        support_response_time: null
+        data_retention_period: "7 days"
+        auto_renewal_term_months: 1
+        termination_for_convenience_days: null
+        customer_data_ownership: null
+        security_standards: null
+        payment_terms: null
+
+notes: |
+  SaaS Master Subscription Agreement Rulepack (v2.0)
+
+  This rulepack focuses on extracting and validating key commercial and operational terms
+  specific to Software-as-a-Service agreements, including:
+  - Service level commitments (uptime, support)
+  - Subscription and renewal terms
+  - Data ownership, retention, and portability
+  - Security and compliance standards
+
+  Global preliminary checks (liability cap, governing law/jurisdiction, fraud clauses,
+  contract value limits) are handled outside this rulepack by the centralized preliminary
+  extraction and validation pipeline.
+
+  This rulepack is designed for use in the two-phase LLM architecture:
+  - Phase 1 (Call 1): Global preliminary extraction (handled externally)
+  - Phase 2 (Call 2): Doc-type-specific extraction using this rulepack's prompt
+
+  Rules evaluate extracted key terms using simple Python expressions. The condition
+  expressions are evaluated in a context where key term names are available as variables.

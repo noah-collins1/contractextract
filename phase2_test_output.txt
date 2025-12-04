@@ -1,0 +1,39 @@
+Traceback (most recent call last):
+  File "C:\Users\noahc\PycharmProjects\langextract\test_phase2_real_ollama.py", line 86, in test_phase2_saas_real_ollama
+    result = extract_doc_type_key_terms(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: extract_doc_type_key_terms() got an unexpected keyword argument 'prelim_extraction'
+
+============================================================
+PHASE 2 REAL OLLAMA TESTS
+============================================================
+
+NOTE: Ensure Ollama is running on http://localhost:11434
+Run: ollama serve
+============================================================
+
+============================================================
+TEST: OllamaProvider.complete() Direct Test
+============================================================
+Calling provider.complete() with test prompt...
+This will make a REAL LLM call...
+
+[OK] Got response: 4
+[OK] Response type: <class 'str'>
+[SUCCESS] .complete() method works correctly!
+
+============================================================
+TEST: Phase 2 SaaS with REAL Ollama
+============================================================
+[OK] Loaded rulepack: saas_msa_v1
+[OK] Created OllamaProvider
+[OK] Provider has .complete() method
+
+Calling extract_doc_type_key_terms with real Ollama provider...
+This will make a REAL LLM call - may take 10-30 seconds...
+
+[FAIL] Error during extraction: extract_doc_type_key_terms() got an unexpected keyword argument 'prelim_extraction'
+
+============================================================
+Phase 2 extraction failed or incomplete
+============================================================

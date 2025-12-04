@@ -1,0 +1,561 @@
+id: "sow_v1"
+schema_version: "2.0"
+doc_type_names:
+  - "Statement of Work"
+  - "SOW"
+  - "Work Order"
+  - "Project Schedule"
+  - "Services Schedule"
+
+classification_hints:
+  keywords:
+    - "statement of work"
+    - "SOW"
+    - "deliverables"
+    - "milestones"
+    - "project schedule"
+    - "scope of work"
+    - "work order"
+    - "acceptance criteria"
+    - "project phases"
+  negative_keywords:
+    - "software as a service"
+    - "SaaS"
+    - "subscription"
+    - "lease of premises"
+    - "employment"
+
+llm_extraction:
+  description: >
+    Extract SOW-specific key terms and facts related to project scope, deliverables,
+    milestones, payment schedule, acceptance criteria, and change management.
+
+  prompt: |
+    You are analyzing a **Statement of Work (SOW)**.
+
+    CRITICAL: You MUST return EXACTLY ONE JSON object with a SINGLE top-level property: "key_terms".
+    Do NOT return top-level keys like "StatementOfWork", "SpecificRequirementsAndTaskDescriptions", "TermsAndConditions", etc.
+    Inside "key_terms", you MUST use ONLY the snake_case field names listed in the schema below.
+
+    Your job is to extract key project terms at two levels:
+    1. HIGH-LEVEL SUMMARY FIELDS for rule evaluation (you may paraphrase these)
+    2. DETAILED STRUCTURED DATA for comprehensive analysis
+    3. EXACT TEXT CITATIONS for each field (no paraphrasing allowed)
+
+    -------------------------------------------------------------------------------
+    ABSOLUTE FORMAT RULES (NO EXCEPTIONS)
+    -------------------------------------------------------------------------------
+    1. Your entire response MUST be EXACTLY one JSON object.
+    2. Do NOT wrap the JSON in markdown code fences. NO ```json, NO ``` at all.
+    3. Do NOT include any text before or after the JSON. No commentary, no explanations.
+       - BAD: "Here is the extracted data in a valid JSON format: {...}"
+       - GOOD: "{...}"
+    4. All keys MUST match the schema names exactly.
+    5. Use JSON booleans true / false (lowercase), not True / False.
+    6. DO NOT include trailing commas in arrays or objects.
+       - BAD: {"key": "value",}
+       - BAD: ["item1", "item2",]
+       - GOOD: {"key": "value"}
+       - GOOD: ["item1", "item2"]
+    7. DO NOT use ellipsis (...) or placeholder text.
+       - If a value is unknown, use null, [], or {} as appropriate
+       - BAD: "value": "..."
+       - GOOD: "value": null
+    8. Output must be valid RFC 8259 JSON:
+       - No comments (// or /* */)
+       - No unquoted keys
+       - No single quotes (use double quotes)
+       - No trailing commas
+    9. Types must match exactly:
+       - Numbers as numbers (no quotes)
+       - Strings as strings (quoted)
+       - Booleans as true/false
+       - Arrays as arrays []
+       - Objects as objects {}
+       - Use null for missing values
+
+    -------------------------------------------------------------------------------
+    REQUIRED JSON STRUCTURE
+    -------------------------------------------------------------------------------
+    Your response must match this EXACT structure:
+
+    {
+      "key_terms": {
+        "scope_of_work_description": "<2-4 sentence summary of the work scope>",
+        "deliverables_count": <number of distinct deliverables/tasks>,
+        "deliverables_summary": "<compact summary list of main deliverables>",
+        "milestones_count": <number of phases/milestones or null>,
+        "project_start_date": "<start date or null>",
+        "project_end_date": "<end date or null>",
+        "total_project_value": <numeric value or null>,
+        "payment_schedule": "<payment terms description or null>",
+        "acceptance_criteria_present": <true if completion/acceptance criteria exist>,
+        "change_order_process_present": <true if change request process exists>,
+        "ip_ownership": "<ownership description or null>",
+        "resource_commitments": "<resource commitments or null>",
+        "specific_requirements_and_task_descriptions": [
+          "<task 1>",
+          "<task 2>"
+        ],
+        "completion_criteria": "<exact completion criteria text or null>",
+        "terms_and_conditions": {
+          "billing_and_payment_terms": "<payment terms or null>",
+          "change_request_process": "<change process or null>",
+          "customer_purchasing_content_development_services": "<relevant terms or null>"
+        },
+        "warranty_acceptance_custom_product": {
+          "warranty_period": "<period or null>",
+          "warranty_fix": "<fix terms or null>"
+        },
+        "citations": {
+          "scope_of_work_description": ["<exact text snippet 1>", "<exact text snippet 2>"],
+          "deliverables_summary": ["<exact text snippet>"],
+          "project_start_date": ["<exact text snippet>"],
+          "project_end_date": ["<exact text snippet>"],
+          "total_project_value": ["<exact text snippet>"],
+          "payment_schedule": ["<exact text snippet>"],
+          "acceptance_criteria_present": ["<exact text snippet>"],
+          "change_order_process_present": ["<exact text snippet>"],
+          "ip_ownership": [],
+          "resource_commitments": []
+        }
+      }
+    }
+
+    -------------------------------------------------------------------------------
+    FIELD-BY-FIELD INSTRUCTIONS
+    -------------------------------------------------------------------------------
+
+    HIGH-LEVEL SUMMARY FIELDS (you may paraphrase these):
+
+    - scope_of_work_description: Write a 2-4 sentence paragraph summarizing the SOW work.
+      Look for "Scope", "Objective", "General", "Work Description" sections.
+
+    - deliverables_count: Count the number of distinct deliverables/tasks.
+      Count items in bullet lists, task tables, or enumerated deliverables.
+      If there are 20+ tasks, just count them.
+
+    - deliverables_summary: A compact list/summary of main deliverables.
+      Limit to ~500 characters. List the top 5-10 deliverables.
+
+    - milestones_count: Count project phases/milestones if explicitly defined.
+      If tasks are listed but not grouped into phases, leave as null.
+
+    - project_start_date: Extract the start date.
+      Look for "Period of Performance", "Start Date", "Project Start".
+
+    - project_end_date: Extract the end date.
+      Look for "Period of Performance", "End Date", "Project Completion".
+
+    - total_project_value: Extract the total project fee as a number.
+      Look for "Total Fee", "Project Value", "Fixed Fee".
+      If the SOW says "$0.00" or doesn't contain a value, set to 0 or null.
+
+    - payment_schedule: Describe payment terms.
+      Look for "Payment Terms", "Billing", "Invoice" sections.
+      E.g. "Billed monthly as delivered, due within 30 days of invoice".
+
+    - acceptance_criteria_present: Set to true if ANY of these exist:
+      - "Completion Criteria" section
+      - "Warranty/Acceptance" language
+      - "This work is complete when..." language
+      - Any acceptance testing or approval process
+
+    - change_order_process_present: Set to true if a change request/change order process is described.
+      Look for "Change Request", "Change Order", "Scope Change" language.
+
+    - ip_ownership: Describe IP ownership if present.
+      Look for "Intellectual Property", "Work Product", "Ownership" sections.
+
+    - resource_commitments: Describe any staffing/resource commitments.
+      E.g. "Dedicated project manager and senior developer".
+
+    DETAILED STRUCTURED DATA:
+
+    - specific_requirements_and_task_descriptions: Array of all task descriptions.
+      Extract from task lists, deliverable tables, or bullet points.
+      Each array item should be a task description string.
+
+    - completion_criteria: Extract the exact completion criteria text if present.
+
+    - terms_and_conditions: Extract specific terms:
+      - billing_and_payment_terms: Payment timing and terms
+      - change_request_process: How changes are requested/approved
+      - Any other relevant T&C sections
+
+    - warranty_acceptance_custom_product: Extract warranty terms if present.
+
+    CITATIONS (NO PARAPHRASING - EXACT TEXT ONLY):
+
+    - For each high-level field you populate, add exact text snippets to citations.
+    - Each citation value is an ARRAY of strings.
+    - Each string must be copied EXACTLY from the document (word-for-word).
+    - Do NOT paraphrase, summarize, or modify citation text.
+    - The citation text will be used for regex search to find page numbers.
+    - If you can't find exact text for a field, use an empty array [].
+
+    Examples:
+    - Good citation: ["Project start date: November 1, 2024"]
+    - Bad citation: ["The project begins in November"] (paraphrased)
+    - Good citation: ["This activity will be complete when SoftChalk has delivered the two micro credential modules"]
+    - Bad citation: ["Work is done when modules are delivered"] (paraphrased)
+
+    -------------------------------------------------------------------------------
+    FINAL CHECKLIST
+    -------------------------------------------------------------------------------
+    Before outputting your JSON, verify:
+    ✓ No markdown code fences (no ```)
+    ✓ No text before or after the JSON (no "Here is...", no explanations)
+    ✓ Valid JSON syntax:
+      - NO trailing commas anywhere (check every array and object)
+      - All strings use double quotes
+      - All keys are quoted
+      - No comments
+    ✓ Single top-level object with "key_terms" key only
+    ✓ All field names in snake_case (not PascalCase like StatementOfWork)
+    ✓ scope_of_work_description is a 2-4 sentence summary
+    ✓ deliverables_count is a number (count of tasks)
+    ✓ deliverables_summary is a compact list
+    ✓ acceptance_criteria_present is true if completion criteria exist
+    ✓ change_order_process_present is true if change process exists
+    ✓ payment_schedule is filled from billing terms
+    ✓ specific_requirements_and_task_descriptions is an array of task strings
+    ✓ citations contains exact text snippets (not paraphrased)
+    ✓ All arrays that should be filled have at least one item
+
+    CRITICAL: Your response must be parseable by Python's json.loads() without any preprocessing.
+    Test your JSON mentally before outputting - no trailing commas, no markdown, no prose.
+
+  response_schema:
+    type: object
+    properties:
+      key_terms:
+        type: object
+        properties:
+          scope_of_work_description: {type: string, nullable: true}
+          deliverables_count: {type: number, nullable: true}
+          deliverables_summary: {type: string, nullable: true}
+          milestones_count: {type: number, nullable: true}
+          project_start_date: {type: string, nullable: true}
+          project_end_date: {type: string, nullable: true}
+          total_project_value: {type: number, nullable: true}
+          payment_schedule: {type: string, nullable: true}
+          acceptance_criteria_present: {type: boolean}
+          change_order_process_present: {type: boolean}
+          ip_ownership: {type: string, nullable: true}
+          resource_commitments: {type: string, nullable: true}
+      citations:
+        type: object
+        properties:
+          scope_of_work_description: {type: string, nullable: true}
+          deliverables_summary: {type: string, nullable: true}
+          project_start_date: {type: string, nullable: true}
+          project_end_date: {type: string, nullable: true}
+          total_project_value: {type: string, nullable: true}
+          payment_schedule: {type: string, nullable: true}
+          acceptance_criteria_present: {type: string, nullable: true}
+          change_order_process_present: {type: string, nullable: true}
+          ip_ownership: {type: string, nullable: true}
+          resource_commitments: {type: string, nullable: true}
+
+key_terms:
+  - name: scope_of_work_description
+    json_path: $.key_terms.scope_of_work_description
+    label: "Scope of Work"
+    description: "High-level description of the project scope and objectives."
+    type: string
+
+  - name: deliverables_count
+    json_path: $.key_terms.deliverables_count
+    label: "Number of Deliverables"
+    description: "Count of distinct deliverables defined in the SOW."
+    type: number
+
+  - name: deliverables_summary
+    json_path: $.key_terms.deliverables_summary
+    label: "Deliverables Summary"
+    description: "Brief list or summary of key deliverables."
+    type: string
+
+  - name: milestones_count
+    json_path: $.key_terms.milestones_count
+    label: "Number of Milestones"
+    description: "Count of project milestones or phases."
+    type: number
+
+  - name: project_start_date
+    json_path: $.key_terms.project_start_date
+    label: "Project Start Date"
+    description: "Scheduled start date of the project."
+    type: string
+
+  - name: project_end_date
+    json_path: $.key_terms.project_end_date
+    label: "Project End Date"
+    description: "Scheduled end date or project duration."
+    type: string
+
+  - name: total_project_value
+    json_path: $.key_terms.total_project_value
+    label: "Total Project Value"
+    description: "Total contract value for the project in USD."
+    type: number
+
+  - name: payment_schedule
+    json_path: $.key_terms.payment_schedule
+    label: "Payment Schedule"
+    description: "Description of payment terms and schedule."
+    type: string
+
+  - name: acceptance_criteria_present
+    json_path: $.key_terms.acceptance_criteria_present
+    label: "Acceptance Criteria Defined"
+    description: "Whether acceptance criteria are explicitly defined."
+    type: boolean
+
+  - name: change_order_process_present
+    json_path: $.key_terms.change_order_process_present
+    label: "Change Order Process Defined"
+    description: "Whether a change order or change request process is documented."
+    type: boolean
+
+  - name: ip_ownership
+    json_path: $.key_terms.ip_ownership
+    label: "IP Ownership"
+    description: "Which party owns intellectual property created during the project."
+    type: string
+
+  - name: resource_commitments
+    json_path: $.key_terms.resource_commitments
+    label: "Resource Commitments"
+    description: "Specific staff or resource commitments from vendor."
+    type: string
+
+rules:
+  - id: sow.scope_clearly_defined
+    label: "Scope of Work Clearly Defined"
+    category: "Scope & Deliverables"
+    severity: "Critical"
+    description: "Verify that the scope of work is explicitly defined and not vague."
+    condition: "(scope_of_work_description is not None and len(scope_of_work_description) > 50) or (deliverables_summary is not None and len(deliverables_summary) > 100)"
+    failure_message: "Scope of work is missing or insufficiently detailed (less than 50 characters)."
+    success_message: "Scope of work is clearly defined."
+    risk_statement: "Vague or missing scope leads to scope creep, disputes over what is included, and cost overruns."
+    recommendation: "Define scope with specific objectives, boundaries, and exclusions. Use clear, measurable language and avoid ambiguous terms like 'reasonable efforts' or 'as needed'."
+
+  - id: sow.deliverables_enumerated
+    label: "Deliverables Clearly Enumerated"
+    category: "Scope & Deliverables"
+    severity: "High"
+    description: "Ensure deliverables are clearly listed and countable."
+    condition: "(deliverables_count is not None and deliverables_count >= 1) or (deliverables_summary is not None and len(deliverables_summary) > 30)"
+    failure_message: "No deliverables are clearly enumerated."
+    success_message: "Deliverables are clearly enumerated."
+    risk_statement: "Undefined deliverables create ambiguity about what the vendor must produce, leading to disputes and project failure."
+    recommendation: "List each deliverable with a clear name, description, format, and due date. Include acceptance criteria for each deliverable."
+
+  - id: sow.acceptance_criteria_present
+    label: "Acceptance Criteria Defined"
+    category: "Quality & Acceptance"
+    severity: "High"
+    description: "Check that acceptance criteria or testing procedures are defined."
+    condition: "acceptance_criteria_present == True"
+    failure_message: "Acceptance criteria are not defined."
+    success_message: "Acceptance criteria are clearly defined."
+    risk_statement: "Without acceptance criteria, the customer cannot objectively determine if deliverables meet requirements, leading to disputes over payment and project completion."
+    recommendation: "Define objective, measurable acceptance criteria for each deliverable. Include testing procedures, success metrics, and the process for acceptance or rejection."
+
+  - id: sow.payment_tied_to_milestones
+    label: "Payment Schedule Defined"
+    category: "Commercial Terms"
+    severity: "Medium"
+    description: "Verify that payment schedule is clearly defined (ideally tied to milestones)."
+    condition: "payment_schedule is not None and len(payment_schedule) >= 20"
+    failure_message: "Payment schedule is not clearly defined."
+    success_message: "Payment schedule is clearly defined."
+    risk_statement: "Undefined payment schedules lead to cash flow issues and disputes. Upfront payments without milestone-based releases expose the customer to vendor non-performance risk."
+    recommendation: "Tie payments to milestone completion and acceptance. Use a schedule like: 20% upon contract signing, 30% at midpoint milestone, 30% at final delivery, 20% after acceptance."
+
+  - id: sow.change_order_process_defined
+    label: "Change Order Process Defined"
+    category: "Change Management"
+    severity: "Medium"
+    description: "Ensure a change order or change request process is documented."
+    condition: "change_order_process_present == True"
+    failure_message: "Change order process is not defined."
+    success_message: "Change order process is clearly defined."
+    risk_statement: "Without a change process, scope changes occur informally, leading to disputes over additional costs and delays."
+    recommendation: "Define a formal change order process including: (1) written change request, (2) impact analysis (time/cost), (3) written approval authority, (4) updated SOW documentation."
+
+  - id: sow.ip_ownership_specified
+    label: "IP Ownership Clearly Specified"
+    category: "Intellectual Property"
+    severity: "High"
+    description: "Verify that ownership of project intellectual property is clearly assigned."
+    condition: "ip_ownership is not None and len(ip_ownership) > 0"
+    failure_message: "IP ownership is not clearly specified."
+    success_message: "IP ownership is clearly specified."
+    risk_statement: "Ambiguous IP ownership leads to disputes over who can use, modify, or commercialize project outputs."
+    recommendation: "Clearly assign IP ownership. For custom development, customer typically should own all work product IP. If vendor retains any rights (e.g., pre-existing tools), document these explicitly."
+
+  - id: sow.project_timeline_defined
+    label: "Project Timeline Defined"
+    category: "Schedule"
+    severity: "Medium"
+    description: "Check that project start and end dates (or duration) are specified."
+    condition: "(project_start_date is not None or project_end_date is not None)"
+    failure_message: "Project timeline (start/end dates or duration) is not defined."
+    success_message: "Project timeline is defined."
+    risk_statement: "Undefined timelines lead to indefinite project duration, resource planning difficulties, and lack of vendor accountability for timely delivery."
+    recommendation: "Specify clear start and end dates, or define project duration and trigger for start. Include milestone dates and remedies for delays (liquidated damages or termination rights)."
+
+  - id: sow.milestones_structured
+    label: "Project Structured with Milestones"
+    category: "Schedule"
+    severity: "Low"
+    description: "Verify that project is broken into phases/milestones (recommended for projects over 3 months)."
+    condition: "milestones_count is not None and milestones_count >= 2"
+    failure_message: "Project is not structured into multiple milestones/phases."
+    success_message: "Project is structured with multiple milestones/phases."
+    risk_statement: "Single-milestone projects lack checkpoints to identify issues early, increasing risk of late-stage failure."
+    recommendation: "Break projects longer than 3 months into at least 2-3 milestones with deliverables and review points at each stage."
+
+examples:
+  - text: |
+      STATEMENT OF WORK
+      Project: CRM System Customization
+
+      1. Scope of Work
+      Vendor will customize Customer's existing Salesforce CRM to support the new product catalog, including integration with the inventory management system and creation of custom reporting dashboards.
+
+      2. Deliverables
+      The following deliverables will be provided:
+      - Phase 1: Requirements Document and Technical Design (Week 4)
+      - Phase 2: Custom Object Configuration and Data Migration Scripts (Week 8)
+      - Phase 3: Integration Development and Testing (Week 12)
+      - Phase 4: Custom Dashboards and User Training Materials (Week 14)
+
+      3. Project Timeline
+      Project start date: January 15, 2025
+      Project completion date: April 30, 2025 (14 weeks)
+
+      4. Acceptance Criteria
+      Each deliverable will be subject to Customer acceptance testing. Customer will have 5 business days to review and approve or reject each deliverable with specific reasons. Vendor will remediate any defects within 3 business days.
+
+      5. Payment Terms
+      Total project fee: $120,000 USD
+      Payment schedule:
+      - 25% ($30,000) upon execution of this SOW
+      - 25% ($30,000) upon acceptance of Phase 2 deliverables
+      - 25% ($30,000) upon acceptance of Phase 3 deliverables
+      - 25% ($30,000) upon final acceptance of all Phase 4 deliverables
+
+      6. Change Orders
+      Any changes to scope, deliverables, or timeline must be documented in a written Change Order signed by both parties, including revised budget and schedule.
+
+      7. Intellectual Property
+      All work product created under this SOW will be owned exclusively by Customer. Vendor retains ownership of pre-existing tools and frameworks, which are licensed to Customer for use with the deliverables.
+
+      8. Resources
+      Vendor will assign a dedicated project manager and at least one senior Salesforce developer for the duration of the project.
+
+    extractions:
+      key_terms:
+        scope_of_work_description: "customize Customer's existing Salesforce CRM to support the new product catalog, including integration with the inventory management system and creation of custom reporting dashboards"
+        deliverables_count: 4
+        deliverables_summary: "Requirements Document and Technical Design, Custom Object Configuration and Data Migration Scripts, Integration Development and Testing, Custom Dashboards and User Training Materials"
+        milestones_count: 4
+        project_start_date: "2025-01-15"
+        project_end_date: "2025-04-30"
+        total_project_value: 120000
+        payment_schedule: "25% upfront, 25% at Phase 2 acceptance, 25% at Phase 3 acceptance, 25% at final acceptance"
+        acceptance_criteria_present: true
+        change_order_process_present: true
+        ip_ownership: "Customer (exclusive ownership of work product)"
+        resource_commitments: "dedicated project manager and at least one senior Salesforce developer"
+
+  - text: |
+      WORK ORDER NO. 2024-05
+      Services: Website Redesign
+
+      Consultant will redesign the client's public website to improve user experience and modernize the visual design.
+
+      The project will be completed within approximately 8 weeks from the start date.
+
+      Deliverables include wireframes, design mockups, and final HTML/CSS templates.
+
+      Total fee: $45,000 payable in two installments - $25,000 upfront and $20,000 upon completion.
+
+      Client will provide timely feedback on drafts. Consultant owns all design IP and grants Client a perpetual license to use the delivered website.
+
+    extractions:
+      key_terms:
+        scope_of_work_description: "redesign the client's public website to improve user experience and modernize the visual design"
+        deliverables_count: 3
+        deliverables_summary: "wireframes, design mockups, and final HTML/CSS templates"
+        milestones_count: null
+        project_start_date: null
+        project_end_date: "approximately 8 weeks from the start date"
+        total_project_value: 45000
+        payment_schedule: "$25,000 upfront and $20,000 upon completion"
+        acceptance_criteria_present: false
+        change_order_process_present: false
+        ip_ownership: "Consultant (with perpetual license to Client)"
+        resource_commitments: null
+
+  - text: |
+      PROJECT SCHEDULE: Data Center Migration Services
+
+      Provider will assist with planning and execution of Customer's data center migration from the Boston facility to the new Chicago facility.
+
+      Provider will deliver a migration plan, execute the physical move during a scheduled maintenance window, and verify all systems are operational post-migration.
+
+      Services will be performed between March 1 and March 31, 2025.
+
+      Customer will pay time and materials at $250/hour for engineering staff and $150/hour for technician staff, with an estimated total budget of $80,000. Invoices submitted monthly.
+
+    extractions:
+      key_terms:
+        scope_of_work_description: "assist with planning and execution of Customer's data center migration from the Boston facility to the new Chicago facility"
+        deliverables_count: 3
+        deliverables_summary: "migration plan, physical move execution, post-migration verification"
+        milestones_count: null
+        project_start_date: "2025-03-01"
+        project_end_date: "2025-03-31"
+        total_project_value: 80000
+        payment_schedule: "time and materials, invoices submitted monthly"
+        acceptance_criteria_present: false
+        change_order_process_present: false
+        ip_ownership: null
+        resource_commitments: "engineering staff at $250/hour and technician staff at $150/hour"
+
+notes: |
+  Statement of Work (SOW) Rulepack (v2.0)
+
+  This rulepack focuses on extracting and validating key project terms specific to
+  Statements of Work and project-based services agreements, including:
+  - Scope definition and clarity
+  - Deliverables enumeration
+  - Acceptance criteria and quality standards
+  - Payment schedule and commercial terms
+  - Change management processes
+  - Intellectual property ownership
+  - Resource commitments and project timeline
+
+  Global preliminary checks (liability cap, governing law/jurisdiction, fraud clauses,
+  contract value limits) are handled outside this rulepack by the centralized preliminary
+  extraction and validation pipeline.
+
+  This rulepack is designed for use in the two-phase LLM architecture:
+  - Phase 1 (Call 1): Global preliminary extraction (handled externally)
+  - Phase 2 (Call 2): Doc-type-specific extraction using this rulepack's prompt
+
+  Rules evaluate extracted key terms using simple Python expressions. The condition
+  expressions are evaluated in a context where key term names are available as variables.
+
+  Key SOW risk areas addressed by rules:
+  - Vague scope leading to scope creep
+  - Missing acceptance criteria causing payment disputes
+  - Undefined change processes leading to uncontrolled changes
+  - IP ownership ambiguity
+  - Lack of milestone structure hiding project issues

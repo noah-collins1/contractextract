@@ -1,0 +1,359 @@
+{
+  "document_name": "WCO - Lipscomb Univeristy 7.10.25 Kinetic Software (WebCheckout) Signed",
+  "passed_all": false,
+  "findings": [
+    {
+      "rule_id": "liability_cap_present_and_within_bounds",
+      "passed": true,
+      "details": "Found explicit monetary cap candidate: 101.00. [auto-guard: numeric citations lacked currency context or referenced shares/units]",
+      "citations": [
+        {
+          "char_start": 11224,
+          "char_end": 13033,
+          "quote": "on, or the configuration of\nClient’s computer systems, may prevent, interrupt or delay Client’s access to the SaaS or data stored within the\nSaaS. WebCheckout is not liable for any delays, interruptions, suspensions or unavailability of the SaaS or the\ndata stored within the SaaS, attributable to problems with the internet or the configuration of Client’s computer\nsystems.\nV2-101018 3\n\u0010\u001a\u0014 \u0017\u0016\u0019\u0001\u0011\u0019 \u0015\u0018\u001a\u001b\u0015\u0001\u0013\u0010 \u0001\u0011 \u0003 \u0011\u0012 \u0002\u0012\u0011\u0003\u0004\u0002\u0006\u0005 \u000e\u0002 \u0010\u0006 \u0002\u0005 \u0011\b\u0007\u0010 \u0010\u0010\u0010\u000f\n7.3 Client acknowledges that the SaaS is intended to perform with, and WebCheckout provides the SaaS\nbased upon, the system requirements specified in the Documentation or instructions provided by WebCheckout\nto Client, as those may be updated by WebCheckout from time to time. WebCheckout has no liability for failure of\nthe SaaS based upon Client’s failure to comply with such system requirements.\n8. Data.\n8.1 Client will have sole and exclusive responsibility for the accuracy, quality, integrity, legality, reliability, and\nappropriateness of all Client Data. Client will not send or store infringing, obscene, threatening, libelous or\notherwise unlawful or tortious material, including material that violates third party privacy or intellectual property\nrights, includes malicious code, or that will interfere with the integrity of the SaaS.\n8.2 Each party agrees that, in the performance of its respective obligations under this Agreement, it shall\ncomply with the provisions of applicable data protection laws to the extent it applies to each of them. Accordingly,\nWebCheckout agrees that it shall: only process Client’s personal data in order to provide the SaaS or in\naccordance with any lawful instructions reasonably given by Client from time to time; (ii) implement appropriate\ntechnical and organizational measures to protect personal data against unauthorized or unlawful processing and\naccidental destruction or loss; and (iii) as soon as reasonably practicable, refer to Client any requests, notices, or\nother communication from data subjects, data protection or other law enforcement authority, for Client to resolve.\n8.3 WebChe",
+          "page": 3,
+          "line_start": 27,
+          "line_end": 45,
+          "confidence": 1.0
+        }
+      ],
+      "tags": []
+    },
+    {
+      "rule_id": "contract_value_within_limit",
+      "passed": true,
+      "details": "No max contract value configured; skipping.",
+      "citations": [],
+      "tags": []
+    },
+    {
+      "rule_id": "fraud_clause_present_and_assigned",
+      "passed": false,
+      "details": "No 'fraud' mention found.",
+      "citations": [],
+      "tags": []
+    },
+    {
+      "rule_id": "jurisdiction_present_and_allowed",
+      "passed": false,
+      "details": "Governing law/jurisdiction detected as \"to be\nunenforceable for any reason, such provision will be changed and interpreted to accomplish the objectives of such\nprovision to the greatest extent possible under applicable law and the remaining provisions hereof shall be\nunaffected and remain in full force and effect.\". Not in allowed list.",
+      "citations": [
+        {
+          "char_start": 19285,
+          "char_end": 19561,
+          "quote": "t regard to conflicts of law principles.\n12.2 Severability. If any provision of this Agreement is held by a court of competent jurisdiction to be\nunenforceable for any reason, such provision will be changed and interpreted to accomplish the objectives of such\nprovision to the greatest extent possible under applicable law and the remaining provisions hereof shall be\nunaffected and remain in full force and effect.\n12.3 Modification and Waiver. Any modification, amendment, supplement, waiver, or other change to this\nAgreement must be in writing and sign",
+          "page": 5,
+          "line_start": 15,
+          "line_end": 18,
+          "confidence": 1.0
+        }
+      ],
+      "tags": []
+    },
+    {
+      "rule_id": "llm_explanations_status",
+      "passed": true,
+      "details": "llm_explanations=enabled (default=enabled, override=None); provider_loaded=True; explanation_error_for=fraud_clause_present_and_assigned: AttributeError(\"'dict' object has no attribute 'strip'\"); explanation_error_for=jurisdiction_present_and_allowed: AttributeError(\"'dict' object has no attribute 'strip'\"); explanations_added=0/2",
+      "citations": [],
+      "tags": []
+    }
+  ],
+  "extraction": null,
+  "report_v2": {
+    "metadata": {
+      "file_name": "WCO - Lipscomb Univeristy 7.10.25 Kinetic Software (WebCheckout) Signed",
+      "document_id": null,
+      "classified_type": "SaaS Agreement",
+      "rulepack_id": "saas_msa_v1",
+      "rulepack_name": "SaaS Agreement",
+      "analysis_timestamp": "2025-12-04T06:49:18.325123+00:00"
+    },
+    "executive_summary": "This SaaS Agreement has an overall risk level of High. Key issues include: Fraud Clause Present And Assigned: No 'fraud' mention found; Jurisdiction Present And Allowed: Governing law/jurisdiction detected as \"to be\nunenforceable for any reason, such provision will be changed and interpreted to accomplish the objectives of such\nprovision to the greatest extent possible under applicable law and the remaining provisions hereof shall be\nunaffected and remain in full force and effect.\". Not in allowed list. The agreement appears to be governed by to be\nunenforceable for any reason, such provision will be changed and interpreted to accomplish the objectives of such\nprovision to the greatest extent possible under applicable law and the remaining provisions hereof shall be\nunaffected and remain in full force and effect..",
+    "preliminary_extraction": {
+      "document_type": "SaaS Agreement",
+      "parties_summary": "WebCheckout and\nClient, shall be the subject of a separate agreement between the parties for development services. Client\nacknowledges that WebCheckout makes available a single general release of the SaaS and shall have complete\ncontrol of the design and development of the SaaS, including with respect to any enhancements or modifications.",
+      "duration": "Not clearly specified",
+      "fees_summary": "Contract value approximately $8,500.00",
+      "termination_summary": "No clear termination clause identified",
+      "jurisdiction": "to be\nunenforceable for any reason, such provision will be changed and interpreted to accomplish the objectives of such\nprovision to the greatest extent possible under applicable law and the remaining provisions hereof shall be\nunaffected and remain in full force and effect.",
+      "citations": [
+        {
+          "char_start": 0,
+          "char_end": 147,
+          "quote": "otiated and agreed to between WebCheckout and\nClient, shall be the subject of a separate agreement between the parties for development services....",
+          "page": null,
+          "line_start": null,
+          "line_end": null,
+          "confidence": 1.0
+        },
+        {
+          "char_start": 0,
+          "char_end": 149,
+          "quote": "zed Users” mean Client’s employees or independent contractors\nworking within their job responsibilities or engagement by Client or other end user for",
+          "page": null,
+          "line_start": null,
+          "line_end": null,
+          "confidence": 1.0
+        },
+        {
+          "char_start": 0,
+          "char_end": 149,
+          "quote": "explicitly stated in this Agreement.\n5. Term and Termination.\n5.1 Term. This Agreement shall commence on the Effective Date and continue for a term o",
+          "page": null,
+          "line_start": null,
+          "line_end": null,
+          "confidence": 1.0
+        }
+      ]
+    },
+    "compliance_checks": [
+      {
+        "check_id": "liability_cap_present_and_within_bounds",
+        "label": "Liability Cap Present And Within Bounds",
+        "status": "PASS",
+        "severity": "High",
+        "message": "Found explicit monetary cap candidate: 101.00. [auto-guard: numeric citations lacked currency context or referenced shares/units]",
+        "citations": [
+          {
+            "char_start": 11224,
+            "char_end": 13033,
+            "quote": "on, or the configuration of\nClient’s computer systems, may prevent, interrupt or delay Client’s access to the SaaS or data stored within the\nSaaS. WebCheckout is not liable for any delays, interruptions, suspensions or unavailability of the SaaS or the\ndata stored within the SaaS, attributable to problems with the internet or the configuration of Client’s computer\nsystems.\nV2-101018 3\n\u0010\u001a\u0014 \u0017\u0016\u0019\u0001\u0011\u0019 \u0015\u0018\u001a\u001b\u0015\u0001\u0013\u0010 \u0001\u0011 \u0003 \u0011\u0012 \u0002\u0012\u0011\u0003\u0004\u0002\u0006\u0005 \u000e\u0002 \u0010\u0006 \u0002\u0005 \u0011\b\u0007\u0010 \u0010\u0010\u0010\u000f\n7.3 Client acknowledges that the SaaS is intended to perform with, and WebCheckout provides the SaaS\nbased upon, the system requirements specified in the Documentation or instructions provided by WebCheckout\nto Client, as those may be updated by WebCheckout from time to time. WebCheckout has no liability for failure of\nthe SaaS based upon Client’s failure to comply with such system requirements.\n8. Data.\n8.1 Client will have sole and exclusive responsibility for the accuracy, quality, integrity, legality, reliability, and\nappropriateness of all Client Data. Client will not send or store infringing, obscene, threatening, libelous or\notherwise unlawful or tortious material, including material that violates third party privacy or intellectual property\nrights, includes malicious code, or that will interfere with the integrity of the SaaS.\n8.2 Each party agrees that, in the performance of its respective obligations under this Agreement, it shall\ncomply with the provisions of applicable data protection laws to the extent it applies to each of them. Accordingly,\nWebCheckout agrees that it shall: only process Client’s personal data in order to provide the SaaS or in\naccordance with any lawful instructions reasonably given by Client from time to time; (ii) implement appropriate\ntechnical and organizational measures to protect personal data against unauthorized or unlawful processing and\naccidental destruction or loss; and (iii) as soon as reasonably practicable, refer to Client any requests, notices, or\nother communication from data subjects, data protection or other law enforcement authority, for Client to resolve.\n8.3 WebChe",
+            "page": 3,
+            "line_start": 27,
+            "line_end": 45,
+            "confidence": 1.0
+          }
+        ],
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "check_id": "contract_value_within_limit",
+        "label": "Contract Value Within Limit",
+        "status": "PASS",
+        "severity": "Medium",
+        "message": "No max contract value configured; skipping.",
+        "citations": [],
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "check_id": "fraud_clause_present_and_assigned",
+        "label": "Fraud Clause Present And Assigned",
+        "status": "FAIL",
+        "severity": "High",
+        "message": "No 'fraud' mention found.",
+        "citations": [],
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "check_id": "jurisdiction_present_and_allowed",
+        "label": "Jurisdiction Present And Allowed",
+        "status": "FAIL",
+        "severity": "High",
+        "message": "Governing law/jurisdiction detected as \"to be\nunenforceable for any reason, such provision will be changed and interpreted to accomplish the objectives of such\nprovision to the greatest extent possible under applicable law and the remaining provisions hereof shall be\nunaffected and remain in full force and effect.\". Not in allowed list.",
+        "citations": [
+          {
+            "char_start": 19285,
+            "char_end": 19561,
+            "quote": "t regard to conflicts of law principles.\n12.2 Severability. If any provision of this Agreement is held by a court of competent jurisdiction to be\nunenforceable for any reason, such provision will be changed and interpreted to accomplish the objectives of such\nprovision to the greatest extent possible under applicable law and the remaining provisions hereof shall be\nunaffected and remain in full force and effect.\n12.3 Modification and Waiver. Any modification, amendment, supplement, waiver, or other change to this\nAgreement must be in writing and sign",
+            "page": 5,
+            "line_start": 15,
+            "line_end": 18,
+            "confidence": 1.0
+          }
+        ],
+        "reason_short": null,
+        "reason_detailed": null
+      }
+    ],
+    "rulepack_summary": {
+      "rulepack_id": "saas_msa_v1",
+      "rulepack_name": "SaaS Agreement",
+      "total_rules": 6,
+      "pass_count": 1,
+      "fail_count": 5,
+      "warn_count": 0,
+      "info_count": 0
+    },
+    "rulepack_rules": [
+      {
+        "rule_id": "saas.uptime_minimum",
+        "label": "Uptime Commitment Meets Minimum",
+        "category": "Service Levels",
+        "status": "FAIL",
+        "severity": "High",
+        "message": "Uptime commitment is below 99.9% or not specified.",
+        "citations": [],
+        "risk_statement": "Low uptime commitments expose the customer to unacceptable service downtime, potentially disrupting business operations.",
+        "recommendation": "Negotiate for at least 99.9% uptime. For mission-critical services, consider 99.95% or 99.99% with strong SLA credits.",
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "rule_id": "saas.auto_renewal_reasonable",
+        "label": "Auto-Renewal Term Reasonable",
+        "category": "Term & Renewal",
+        "status": "PASS",
+        "severity": "Medium",
+        "message": "Auto-renewal term is 12 months or less, or not specified.",
+        "citations": [],
+        "risk_statement": null,
+        "recommendation": null,
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "rule_id": "saas.termination_flexibility",
+        "label": "Termination for Convenience Allowed",
+        "category": "Term & Termination",
+        "status": "FAIL",
+        "severity": "Medium",
+        "message": "Termination for convenience requires more than 90 days notice or is not allowed.",
+        "citations": [],
+        "risk_statement": "Inability to terminate or long notice periods trap the customer in the agreement even if service quality degrades or business needs change.",
+        "recommendation": "Negotiate termination for convenience with 30-60 days notice. If termination is only for cause, add clear performance metrics that trigger termination rights.",
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "rule_id": "saas.customer_data_ownership",
+        "label": "Customer Data Ownership Confirmed",
+        "category": "Data Rights",
+        "status": "FAIL",
+        "severity": "High",
+        "message": "Customer data ownership is not clearly stated.",
+        "citations": [],
+        "risk_statement": "Ambiguous data ownership can lead to disputes over data rights, portability, and usage after termination.",
+        "recommendation": "Add explicit clause: 'Customer retains all right, title, and interest in and to Customer Data.' Ensure data portability rights are clearly defined.",
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "rule_id": "saas.data_retention_specified",
+        "label": "Data Retention Period Specified",
+        "category": "Data Rights",
+        "status": "FAIL",
+        "severity": "Medium",
+        "message": "Post-termination data retention period is not specified.",
+        "citations": [],
+        "risk_statement": "Unclear data retention policies can result in unexpected data deletion or indefinite retention, raising compliance concerns.",
+        "recommendation": "Specify a reasonable retention period (e.g., 30-90 days) with clear data export and deletion procedures upon request.",
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "rule_id": "saas.security_standards_present",
+        "label": "Security Standards Documented",
+        "category": "Security & Compliance",
+        "status": "FAIL",
+        "severity": "Medium",
+        "message": "No security standards or certifications are documented.",
+        "citations": [],
+        "risk_statement": "Absence of documented security standards increases risk of data breaches and regulatory non-compliance.",
+        "recommendation": "Require provider to maintain SOC 2 Type II, ISO 27001, or equivalent certifications. Include audit rights and breach notification provisions.",
+        "reason_short": null,
+        "reason_detailed": null
+      }
+    ],
+    "extracted_key_terms": {
+      "property_address": null,
+      "lease_term": null,
+      "base_rent": null,
+      "salary": null,
+      "role_title": null,
+      "non_compete_duration": null,
+      "service_description": {
+        "label": "Service Description",
+        "value": null,
+        "citation": null,
+        "type": "string",
+        "description": "High-level description of the SaaS services being provided."
+      },
+      "uptime_commitment_percent": {
+        "label": "Uptime Commitment (%)",
+        "value": null,
+        "citation": null,
+        "type": "number",
+        "description": "Numeric uptime commitment percentage (e.g., 99.9)."
+      },
+      "support_response_time": {
+        "label": "Support Response Time",
+        "value": null,
+        "citation": null,
+        "type": "string",
+        "description": "Committed support response time for critical issues."
+      },
+      "data_retention_period": {
+        "label": "Data Retention Period",
+        "value": null,
+        "citation": null,
+        "type": "string",
+        "description": "Duration customer data is retained after termination."
+      },
+      "auto_renewal_term_months": {
+        "label": "Auto-Renewal Term (Months)",
+        "value": null,
+        "citation": null,
+        "type": "number",
+        "description": "Length of automatic renewal term in months."
+      },
+      "termination_for_convenience_days": {
+        "label": "Termination Notice Period (Days)",
+        "value": null,
+        "citation": null,
+        "type": "number",
+        "description": "Days of notice required to terminate without cause."
+      },
+      "customer_data_ownership": {
+        "label": "Customer Data Ownership",
+        "value": null,
+        "citation": null,
+        "type": "string",
+        "description": "Statement confirming customer ownership of their data."
+      },
+      "security_standards": {
+        "label": "Security Standards",
+        "value": null,
+        "citation": null,
+        "type": "string",
+        "description": "Security certifications or standards provider complies with."
+      },
+      "payment_terms": {
+        "label": "Payment Terms",
+        "value": null,
+        "citation": null,
+        "type": "string",
+        "description": "Payment frequency and timing (e.g., annual in advance)."
+      }
+    },
+    "risk_assessment": {
+      "overall_risk_level": "High",
+      "top_risks": [
+        "Fraud Clause Present And Assigned: No 'fraud' mention found",
+        "Jurisdiction Present And Allowed: Governing law/jurisdiction detected as \"to be\nunenforceable for any reason, such provision will be changed and interpreted to accomplish the objectives of such\nprovision to the greatest extent possible under applicable law and the remaining provisions hereof shall be\nunaffected and remain in full force and effect.\". Not in allowed list",
+        "Low uptime commitments expose the customer to unacceptable service downtime, potentially disrupting business operations.",
+        "Inability to terminate or long notice periods trap the customer in the agreement even if service quality degrades or business needs change.",
+        "Ambiguous data ownership can lead to disputes over data rights, portability, and usage after termination."
+      ],
+      "recommendations": [
+        "Negotiate for at least 99.9% uptime. For mission-critical services, consider 99.95% or 99.99% with strong SLA credits.",
+        "Negotiate termination for convenience with 30-60 days notice. If termination is only for cause, add clear performance metrics that trigger termination rights.",
+        "Add explicit clause: 'Customer retains all right, title, and interest in and to Customer Data.' Ensure data portability rights are clearly defined.",
+        "Specify a reasonable retention period (e.g., 30-90 days) with clear data export and deletion procedures upon request.",
+        "Require provider to maintain SOC 2 Type II, ISO 27001, or equivalent certifications. Include audit rights and breach notification provisions."
+      ],
+      "recommendations_per_check": {
+        "fraud_clause_present_and_assigned": "Insert a fraud clause in Section 1.3 of the contract, stating that 'Client shall not engage in any fraudulent activity while using the Software' and assign it to WebCheckout.",
+        "jurisdiction_present_and_allowed": "Replace the governing law/jurisdiction provision with a clear and specific statement, such as 'This Agreement shall be governed by and construed in accordance with the laws of the State of Pennsylvania, without giving effect to any principles of conflicts of law.'",
+        "saas.uptime_minimum": "Add a uptime commitment clause in Section 1.2, stating that WebCheckout guarantees an uptime of at least 99.9% for the Software, and specify the method of measurement (e.g., 'Uptime shall be measured using [insert method]')",
+        "saas.termination_flexibility": "Modify the termination provision to allow for termination with a notice period of no more than 30 days, stating that 'Either party may terminate this Agreement upon thirty (30) days' written notice to the other party.'",
+        "saas.customer_data_ownership": "Insert a data ownership clause in Section 2.3, stating that 'Client retains all rights, title, and interest in and to its Data, including any intellectual property rights, and WebCheckout shall not claim or assert any ownership over such Data' and specify the definition of 'Data'"
+      },
+      "risk_calculation_method": "Hybrid"
+    },
+    "citation_map": {},
+    "passed_all": false
+  }
+}

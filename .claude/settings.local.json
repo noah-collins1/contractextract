@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker-compose logs:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker restart:*)",
+      "WebSearch",
+      "WebFetch(domain:www.librechat.ai)",
+      "WebFetch(domain:github.com)",
+      "Read(//c/Users/noahc/LibreChat/**)",
+      "WebFetch(domain:spec.modelcontextprotocol.io)",
+      "Bash(if [ -f \"archive/frontend/front/src/theme.css\" ])",
+      "Bash(then cp \"archive/frontend/front/src/theme.css\" \"frontend/src/\")",
+      "Bash(else echo \"theme.css not found in archive\")",
+      "Bash(fi)",
+      "Bash(..venvScriptspython.exe -c \"import fastapi, uvicorn; print(''FastAPI and uvicorn available'')\")",
+      "Bash(python:*)",
+      "Bash(curl:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,0 +1,363 @@
+{
+  "document_name": "SFC - Kennesaw_State_University-Micro_Credential_Module_Authoring-SoftChalk_SOW_2024_tsbb_v3(1)(2) (002)",
+  "passed_all": false,
+  "findings": [
+    {
+      "rule_id": "liability_cap_present_and_within_bounds",
+      "passed": false,
+      "details": "No clear 'Limitation of Liability' section found.",
+      "citations": [],
+      "tags": []
+    },
+    {
+      "rule_id": "contract_value_within_limit",
+      "passed": true,
+      "details": "No max contract value configured; skipping.",
+      "citations": [],
+      "tags": []
+    },
+    {
+      "rule_id": "fraud_clause_present_and_assigned",
+      "passed": false,
+      "details": "No 'fraud' mention found.",
+      "citations": [],
+      "tags": []
+    },
+    {
+      "rule_id": "jurisdiction_present_and_allowed",
+      "passed": false,
+      "details": "No clear 'governing law / jurisdiction' clause detected.",
+      "citations": [],
+      "tags": []
+    },
+    {
+      "rule_id": "llm_explanations_status",
+      "passed": true,
+      "details": "llm_explanations=enabled (default=enabled, override=None); provider_loaded=True; explanation_error_for=liability_cap_present_and_within_bounds: AttributeError(\"'dict' object has no attribute 'strip'\"); explanation_error_for=fraud_clause_present_and_assigned: AttributeError(\"'dict' object has no attribute 'strip'\"); explanation_error_for=jurisdiction_present_and_allowed: AttributeError(\"'dict' object has no attribute 'strip'\"); explanations_added=0/3",
+      "citations": [],
+      "tags": []
+    }
+  ],
+  "extraction": null,
+  "report_v2": {
+    "metadata": {
+      "file_name": "SFC - Kennesaw_State_University-Micro_Credential_Module_Authoring-SoftChalk_SOW_2024_tsbb_v3(1)(2) (002)",
+      "document_id": null,
+      "classified_type": "Statement of Work",
+      "rulepack_id": "sow_v1",
+      "rulepack_name": "Statement of Work",
+      "analysis_timestamp": "2025-12-04T09:46:53.566804+00:00"
+    },
+    "executive_summary": "This Statement of Work has an overall risk level of High. Key issues include: Liability Cap Present And Within Bounds: No clear 'Limitation of Liability' section found; Fraud Clause Present And Assigned: No 'fraud' mention found.",
+    "preliminary_extraction": {
+      "document_type": "Statement of Work",
+      "parties_summary": "SoftChalk and Kennesaw State\nUniversity",
+      "duration": "Not clearly specified",
+      "fees_summary": "Contract value approximately $9,950.00",
+      "termination_summary": "This activity will be complete when SoftChalk has delivered the two micro (Completion Criteria)",
+      "jurisdiction": "Not specified",
+      "citations": [
+        {
+          "char_start": 0,
+          "char_end": 99,
+          "quote": "lined in the contract between SoftChalk and Kennesaw State\nUniversity: “SoftChalk Enterprise Servic",
+          "page": null,
+          "line_start": null,
+          "line_end": null,
+          "confidence": 1.0
+        },
+        {
+          "char_start": 0,
+          "char_end": 149,
+          "quote": "agreement is subject to the terms outlined in the contract between SoftChalk and Kennesaw State\nUniversity: “SoftChalk Enterprise Services Agreement”",
+          "page": null,
+          "line_start": null,
+          "line_end": null,
+          "confidence": 1.0
+        },
+        {
+          "char_start": 0,
+          "char_end": 150,
+          "quote": "y\nChildren and Family Programs\nSeptember 20, 2024\nThis agreement is subject to the terms outlined in the contract between SoftChalk and Kennesaw State",
+          "page": null,
+          "line_start": null,
+          "line_end": null,
+          "confidence": 1.0
+        }
+      ]
+    },
+    "compliance_checks": [
+      {
+        "check_id": "liability_cap_present_and_within_bounds",
+        "label": "Liability Cap Present And Within Bounds",
+        "status": "FAIL",
+        "severity": "High",
+        "message": "No clear 'Limitation of Liability' section found.",
+        "citations": [],
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "check_id": "contract_value_within_limit",
+        "label": "Contract Value Within Limit",
+        "status": "PASS",
+        "severity": "Medium",
+        "message": "No max contract value configured; skipping.",
+        "citations": [],
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "check_id": "fraud_clause_present_and_assigned",
+        "label": "Fraud Clause Present And Assigned",
+        "status": "FAIL",
+        "severity": "High",
+        "message": "No 'fraud' mention found.",
+        "citations": [],
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "check_id": "jurisdiction_present_and_allowed",
+        "label": "Jurisdiction Present And Allowed",
+        "status": "FAIL",
+        "severity": "High",
+        "message": "No clear 'governing law / jurisdiction' clause detected.",
+        "citations": [],
+        "reason_short": null,
+        "reason_detailed": null
+      }
+    ],
+    "rulepack_summary": {
+      "rulepack_id": "sow_v1",
+      "rulepack_name": "Statement of Work",
+      "total_rules": 8,
+      "pass_count": 6,
+      "fail_count": 2,
+      "warn_count": 0,
+      "info_count": 0
+    },
+    "rulepack_rules": [
+      {
+        "rule_id": "sow.scope_clearly_defined",
+        "label": "Scope of Work Clearly Defined",
+        "category": "Scope & Deliverables",
+        "status": "PASS",
+        "severity": "Critical",
+        "message": "Scope of work is clearly defined.",
+        "citations": [],
+        "risk_statement": null,
+        "recommendation": null,
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "rule_id": "sow.deliverables_enumerated",
+        "label": "Deliverables Clearly Enumerated",
+        "category": "Scope & Deliverables",
+        "status": "PASS",
+        "severity": "High",
+        "message": "Deliverables are clearly enumerated.",
+        "citations": [],
+        "risk_statement": null,
+        "recommendation": null,
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "rule_id": "sow.acceptance_criteria_present",
+        "label": "Acceptance Criteria Defined",
+        "category": "Quality & Acceptance",
+        "status": "PASS",
+        "severity": "High",
+        "message": "Acceptance criteria are clearly defined.",
+        "citations": [],
+        "risk_statement": null,
+        "recommendation": null,
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "rule_id": "sow.payment_tied_to_milestones",
+        "label": "Payment Schedule Defined",
+        "category": "Commercial Terms",
+        "status": "PASS",
+        "severity": "Medium",
+        "message": "Payment schedule is clearly defined.",
+        "citations": [],
+        "risk_statement": null,
+        "recommendation": null,
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "rule_id": "sow.change_order_process_defined",
+        "label": "Change Order Process Defined",
+        "category": "Change Management",
+        "status": "PASS",
+        "severity": "Medium",
+        "message": "Change order process is clearly defined.",
+        "citations": [],
+        "risk_statement": null,
+        "recommendation": null,
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "rule_id": "sow.ip_ownership_specified",
+        "label": "IP Ownership Clearly Specified",
+        "category": "Intellectual Property",
+        "status": "FAIL",
+        "severity": "High",
+        "message": "IP ownership is not clearly specified.",
+        "citations": [],
+        "risk_statement": "Ambiguous IP ownership leads to disputes over who can use, modify, or commercialize project outputs.",
+        "recommendation": "Clearly assign IP ownership. For custom development, customer typically should own all work product IP. If vendor retains any rights (e.g., pre-existing tools), document these explicitly.",
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "rule_id": "sow.project_timeline_defined",
+        "label": "Project Timeline Defined",
+        "category": "Schedule",
+        "status": "PASS",
+        "severity": "Medium",
+        "message": "Project timeline is defined.",
+        "citations": [],
+        "risk_statement": null,
+        "recommendation": null,
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "rule_id": "sow.milestones_structured",
+        "label": "Project Structured with Milestones",
+        "category": "Schedule",
+        "status": "FAIL",
+        "severity": "Low",
+        "message": "Project is not structured into multiple milestones/phases.",
+        "citations": [],
+        "risk_statement": "Single-milestone projects lack checkpoints to identify issues early, increasing risk of late-stage failure.",
+        "recommendation": "Break projects longer than 3 months into at least 2-3 milestones with deliverables and review points at each stage.",
+        "reason_short": null,
+        "reason_detailed": null
+      }
+    ],
+    "extracted_key_terms": {
+      "property_address": null,
+      "lease_term": null,
+      "base_rent": null,
+      "salary": null,
+      "role_title": null,
+      "non_compete_duration": null,
+      "scope_of_work_description": {
+        "label": "Scope of Work",
+        "value": "This Statement of Work covers content development and micro-credential module authoring, including tasks such as Add Source Material Provided by KSU to SoftChalk Create SC KSU, Convert source material to .txt where able and when source material was not provided in",
+        "citation": null,
+        "type": "string",
+        "description": "High-level description of the project scope and objectives."
+      },
+      "deliverables_count": {
+        "label": "Number of Deliverables",
+        "value": 2,
+        "citation": null,
+        "type": "number",
+        "description": "Count of distinct deliverables defined in the SOW."
+      },
+      "deliverables_summary": {
+        "label": "Deliverables Summary",
+        "value": "Add Source Material Provided by KSU to SoftChalk Create SC KSU; Convert source material to .txt where able and when source material was not provided in X.txt format",
+        "citation": null,
+        "type": "string",
+        "description": "Brief list or summary of key deliverables."
+      },
+      "milestones_count": {
+        "label": "Number of Milestones",
+        "value": null,
+        "citation": null,
+        "type": "number",
+        "description": "Count of project milestones or phases."
+      },
+      "project_start_date": {
+        "label": "Project Start Date",
+        "value": "November 1, 2024",
+        "citation": null,
+        "type": "string",
+        "description": "Scheduled start date of the project."
+      },
+      "project_end_date": {
+        "label": "Project End Date",
+        "value": "April 30, 2025",
+        "citation": null,
+        "type": "string",
+        "description": "Scheduled end date or project duration."
+      },
+      "total_project_value": {
+        "label": "Total Project Value",
+        "value": null,
+        "citation": null,
+        "type": "number",
+        "description": "Total contract value for the project in USD."
+      },
+      "payment_schedule": {
+        "label": "Payment Schedule",
+        "value": "Unless otherwise agreed in writing, SoftChalk’s services are billed monthly as delivered.",
+        "citation": null,
+        "type": "string",
+        "description": "Description of payment terms and schedule."
+      },
+      "acceptance_criteria_present": {
+        "label": "Acceptance Criteria Defined",
+        "value": true,
+        "citation": null,
+        "type": "boolean",
+        "description": "Whether acceptance criteria are explicitly defined."
+      },
+      "change_order_process_present": {
+        "label": "Change Order Process Defined",
+        "value": true,
+        "citation": null,
+        "type": "boolean",
+        "description": "Whether a change order or change request process is documented."
+      },
+      "ip_ownership": {
+        "label": "IP Ownership",
+        "value": null,
+        "citation": null,
+        "type": "string",
+        "description": "Which party owns intellectual property created during the project."
+      },
+      "resource_commitments": {
+        "label": "Resource Commitments",
+        "value": null,
+        "citation": null,
+        "type": "string",
+        "description": "Specific staff or resource commitments from vendor."
+      }
+    },
+    "risk_assessment": {
+      "overall_risk_level": "High",
+      "top_risks": [
+        "Liability Cap Present And Within Bounds: No clear 'Limitation of Liability' section found",
+        "Fraud Clause Present And Assigned: No 'fraud' mention found",
+        "Jurisdiction Present And Allowed: No clear 'governing law / jurisdiction' clause detected",
+        "Ambiguous IP ownership leads to disputes over who can use, modify, or commercialize project outputs.",
+        "Single-milestone projects lack checkpoints to identify issues early, increasing risk of late-stage failure."
+      ],
+      "recommendations": [
+        "Clearly assign IP ownership. For custom development, customer typically should own all work product IP. If vendor retains any rights (e.g., pre-existing tools), document these explicitly.",
+        "Break projects longer than 3 months into at least 2-3 milestones with deliverables and review points at each stage."
+      ],
+      "recommendations_per_check": {
+        "liability_cap_present_and_within_bounds": "Add a 'Limitation of Liability' section to the contract, specifying the maximum amount of liability that SoftChalk LLC will assume. This can be done by inserting a new clause after Section 1.0 General.",
+        "fraud_clause_present_and_assigned": "Insert a 'Fraud' clause in the contract, defining what constitutes fraud and outlining the consequences for fraudulent behavior. This can be done by adding a new section after Section 1.2 Background.",
+        "jurisdiction_present_and_allowed": "Add a 'Governing Law / Jurisdiction' clause to specify which jurisdiction's laws will govern this agreement and any disputes arising from it. This can be done by inserting a new clause after Section 1.0 General.",
+        "sow.ip_ownership_specified": "Specify the ownership of intellectual property (IP) in the contract, clarifying who retains ownership of IP created or developed during the project. This can be done by adding a new section after Section 1.2 Background.",
+        "sow.milestones_structured": "Reorganize the project structure to include multiple milestones/phases, with clear descriptions and timelines for each phase. This can be done by inserting new sections between existing ones, such as between Section 1.0 General and Section 1.1 Introduction."
+      },
+      "risk_calculation_method": "Hybrid"
+    },
+    "citation_map": {},
+    "passed_all": false
+  }
+}

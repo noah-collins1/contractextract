@@ -1,0 +1,299 @@
+id: lease_agreement_v1
+schema_version: "1.0"
+doc_type_names:
+  - "Lease Agreement"
+  - "Commercial Lease"
+  - "Rental Agreement"
+  - "Lease Contract"
+  - "Lease Abstract"
+jurisdiction_allowlist:
+  - United States
+  - Canada
+liability_cap:
+  max_cap_amount: null
+  max_cap_multiplier: null
+contract:
+  max_contract_value: null
+fraud:
+  require_fraud_clause: false
+  require_liability_on_other_party: false
+rules:
+  - id: property_identification
+    type: lease.property
+    params:
+      require_property_details: true
+  - id: tenant_identification
+    type: lease.tenant
+    params:
+      require_tenant_details: true
+  - id: lease_dates_required
+    type: lease.dates
+    params:
+      require_execution_date: true
+      require_commencement_date: true
+      require_expiration_date: true
+  - id: rent_terms_required
+    type: lease.rent
+    params:
+      require_base_rent: true
+      require_payment_frequency: true
+  - id: security_deposit_check
+    type: lease.security
+    params:
+      check_security_deposit: true
+  - id: late_fee_terms
+    type: lease.fees
+    params:
+      require_late_fee_terms: true
+  - id: default_provisions
+    type: lease.default
+    params:
+      require_default_terms: true
+  - id: option_rights_check
+    type: lease.options
+    params:
+      check_renewal_options: true
+      check_expansion_options: true
+      check_termination_options: true
+  - id: operating_expenses
+    type: lease.expenses
+    params:
+      check_cam_charges: true
+      check_tax_recovery: true
+      check_insurance_recovery: true
+
+prompt: |
+  You are analyzing a Commercial Lease Agreement.
+
+  Extract ALL of the following information from the lease document:
+
+  **PROPERTY INFORMATION:**
+  - Property Name
+  - Property Address (full street address, city, state, zip)
+  - Property ID/Number
+  - Suite Number
+
+  **TENANT INFORMATION:**
+  - Tenant Name (legal entity name)
+  - Billing Address
+  - Contact Name
+  - Phone Number
+  - Fax Number
+  - Email Address
+
+  **LEASE DATES:**
+  - Execution Date (date lease was signed)
+  - Commencement Date (lease start date)
+  - Expiration Date (lease end date)
+  - Possession Date (if different from commencement)
+
+  **RENT TERMS:**
+  - Base Rent Amount (monthly amount)
+  - Rent Start Date
+  - Rent Escalation Terms (CPI adjustments, fixed increases, etc.)
+  - CPI Name & Base Index
+  - Base Index Month/Year
+  - Life and/or Annual Cap on increases
+
+  **RECOVERY CHARGES (Monthly Amounts):**
+  - CAM (Common Area Maintenance) charges
+  - Real Estate Taxes recovery
+  - Insurance recovery
+  - Sales Tax Rate (if applicable)
+
+  **ADDITIONAL CHARGES:**
+  - Overtime HVAC Rate
+  - Parking charges
+  - Storage charges
+  - Utilities (electricity, water, etc.)
+
+  **SECURITY & DEPOSITS:**
+  - Security Deposit Amount
+  - Security Deposit Check Number
+  - Letter of Credit (Yes/No)
+  - Letter of Credit Number
+  - Letter of Credit Issue Date
+  - Letter of Credit Maturity Date
+  - Letter of Credit Expiration Date
+  - Beneficiary/Entity
+  - Bank/Institution Name
+
+  **LATE FEES & DEFAULT:**
+  - Late Fee Calculation Type
+  - Default Percentage
+  - Grace Period (days)
+  - Holdover Charges
+
+  **PERCENTAGE RENT:**
+  - Percentage Rent Required (Yes/No)
+  - Sales Reporting Required
+  - Percentage Rate
+  - Breakpoint Amount
+
+  **LEASE OPTIONS:**
+  - Renewal Options (number, terms, notice period)
+  - Right of First Refusal (ROFR)
+  - Right of First Offer (ROFO)
+  - Expansion Options
+  - Contraction Rights
+  - Termination Options
+  - Relocation Rights
+
+  **SPECIAL RIGHTS & CLAUSES:**
+  - Building Naming Rights
+  - Roof Access Rights
+  - Signage Rights
+  - Telecommunication Rights
+  - Antenna/Dish Rights
+  - Conference Center Access
+  - Emergency Generator Access
+  - Fitness Center Access
+
+  **TENANT OBLIGATIONS:**
+  - Tenant Repair & Maintenance Requirements
+  - Insurance Requirements (types, amounts, endorsements)
+  - Tenant Service Request Markup
+  - Advanced Rent Due
+
+  **LANDLORD OBLIGATIONS:**
+  - Landlord Improvements (TI allowance, scope)
+  - Landlord Fees
+  - Amortization Terms
+
+  **ASSIGNMENT & SUBLETTING:**
+  - Assignment Rights
+  - Subletting Rights
+  - Landlord Consent Requirements
+
+  **LEGAL & COMPLIANCE:**
+  - Audit Rights
+  - Credit Review Requirements
+  - Guarantor Information
+  - Tenant's Financial Requirements
+  - OFAC Requirements
+  - Estoppel Certificate Requirements
+  - Subordination & Non-Disturbance Agreement
+
+  **NOTICES:**
+  - Notice Address for Landlord
+  - Notice Address for Tenant
+  - Notice Requirements (method, timing)
+
+  **COMMISSION:**
+  - Broker Name(s)
+  - Commission Amount
+  - Commission Terms
+
+  **OTHER TERMS:**
+  - Rent Concession/Abatement (free rent periods)
+  - Month-to-Month Terms (if applicable)
+  - Amendment Type (if this is an amendment)
+
+  Label each extraction with the appropriate field name (use snake_case).
+  For dollar amounts, extract the numeric value and currency.
+  For dates, extract in MM/DD/YYYY format if possible.
+  For percentages, extract the numeric value.
+  If information is not found, indicate "Not Specified" in your analysis.
+
+examples:
+  - text: "The Landlord hereby leases to Tenant the premises located at 123 Main Street, Suite 500, New York, NY 10001, commonly known as 'Metro Tower'."
+    extractions:
+      - label: property_address
+        span: "123 Main Street, Suite 500, New York, NY 10001"
+        attributes: { street: "123 Main Street", suite: "500", city: "New York", state: "NY", zip: "10001" }
+      - label: property_name
+        span: "Metro Tower"
+      - label: suite_number
+        span: "500"
+
+  - text: "Base Rent shall be $15,000.00 per month, payable on the first day of each month."
+    extractions:
+      - label: base_rent
+        span: "$15,000.00 per month"
+        attributes: { amount: 15000, currency: "USD", frequency: "monthly" }
+      - label: rent_payment_due_date
+        span: "first day of each month"
+        attributes: { day_of_month: 1 }
+
+  - text: "Tenant shall pay as additional rent Tenant's Proportionate Share of Operating Expenses, estimated at $5.50 per rentable square foot per annum."
+    extractions:
+      - label: operating_expenses
+        span: "$5.50 per rentable square foot per annum"
+        attributes: { rate_per_sqft: 5.50, period: "annual" }
+
+  - text: "Security Deposit in the amount of $30,000.00 shall be provided via Letter of Credit #LC-2024-001 issued by Bank of America, maturing December 31, 2025."
+    extractions:
+      - label: security_deposit_amount
+        span: "$30,000.00"
+        attributes: { amount: 30000, currency: "USD" }
+      - label: letter_of_credit
+        span: "Letter of Credit #LC-2024-001"
+        attributes: { lc_number: "LC-2024-001", bank: "Bank of America", maturity_date: "12/31/2025" }
+
+  - text: "Late charges shall accrue at a rate of 5% per month on any unpaid balance after a 5-day grace period."
+    extractions:
+      - label: late_fee_percentage
+        span: "5% per month"
+        attributes: { rate: 5.0, period: "monthly" }
+      - label: grace_period
+        span: "5-day grace period"
+        attributes: { days: 5 }
+
+  - text: "Tenant shall have two (2) options to renew for five (5) year terms each, with notice required six (6) months prior to expiration."
+    extractions:
+      - label: renewal_options
+        span: "two (2) options to renew for five (5) year terms each"
+        attributes: { number_of_options: 2, term_years: 5, notice_months: 6 }
+
+  - text: "Base Rent shall increase annually based on CPI-U (Consumer Price Index for All Urban Consumers), capped at 3% per year."
+    extractions:
+      - label: rent_escalation
+        span: "increase annually based on CPI-U"
+        attributes: { method: "CPI", index: "CPI-U", cap_percent: 3.0, frequency: "annual" }
+
+  - text: "Tenant's Proportionate Share of Common Area Maintenance (CAM) charges is estimated at $2,500.00 per month."
+    extractions:
+      - label: cam_charges
+        span: "$2,500.00 per month"
+        attributes: { amount: 2500, currency: "USD", frequency: "monthly" }
+
+  - text: "Lease shall commence on January 1, 2024 and expire on December 31, 2028, executed this 15th day of November, 2023."
+    extractions:
+      - label: commencement_date
+        span: "January 1, 2024"
+        attributes: { date: "01/01/2024" }
+      - label: expiration_date
+        span: "December 31, 2028"
+        attributes: { date: "12/31/2028" }
+      - label: execution_date
+        span: "15th day of November, 2023"
+        attributes: { date: "11/15/2023" }
+
+  - text: "Tenant: Acme Corporation, Inc., a Delaware corporation, with principal offices at 456 Business Blvd, Suite 200, Chicago, IL 60601. Contact: John Smith, VP Operations, Phone: (312) 555-1234, Email: jsmith@acme.com"
+    extractions:
+      - label: tenant_name
+        span: "Acme Corporation, Inc."
+        attributes: { entity_type: "Delaware corporation" }
+      - label: tenant_address
+        span: "456 Business Blvd, Suite 200, Chicago, IL 60601"
+      - label: contact_name
+        span: "John Smith"
+        attributes: { title: "VP Operations" }
+      - label: contact_phone
+        span: "(312) 555-1234"
+      - label: contact_email
+        span: "jsmith@acme.com"
+
+notes: |
+  This rulepack is designed to extract comprehensive lease agreement information following the
+  standard Manager Abstract format used in commercial real estate.
+
+  Key compliance areas:
+  - Financial Terms: Base rent, escalations, operating expenses, additional charges
+  - Dates & Duration: All critical lease dates and term information
+  - Security: Deposits, letters of credit, financial guarantees
+  - Rights & Options: Renewal, expansion, termination, ROFR/ROFO
+  - Obligations: Tenant and landlord responsibilities
+  - Legal: Default, compliance, assignment provisions
+
+  This template covers the 118 standard fields used in commercial lease abstracts.

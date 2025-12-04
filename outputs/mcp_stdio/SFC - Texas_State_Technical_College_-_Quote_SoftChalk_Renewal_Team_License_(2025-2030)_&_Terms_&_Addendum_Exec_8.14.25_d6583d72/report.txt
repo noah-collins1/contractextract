@@ -1,0 +1,254 @@
+{
+  "document_name": "SFC - Texas_State_Technical_College_-_Quote_SoftChalk_Renewal_Team_License_(2025-2030)_&_Terms_&_Addendum_Exec_8.14.25",
+  "passed_all": false,
+  "findings": [
+    {
+      "rule_id": "liability_cap_present_and_within_bounds",
+      "passed": false,
+      "details": "No clear cap indicator ('12 months of fees' or explicit monetary cap) detected.",
+      "citations": [
+        {
+          "char_start": 17442,
+          "char_end": 19251,
+          "quote": "efuse to post and can remove any information or materials, in whole or in\npart, that it, at its sole discretion, deems to be offensive, indecent, or otherwise\ninappropriate regardless of whether such material or its dissemination is unlawful.\n\nSubmissions—Privacy Safeguards\n\nWhile SoftChalk strives to maintain your privacy (see our Privacy Policy), you should always use\ncaution when giving out any personally identifiable information about yourself in any Public\nSubmissions. Any Public Submissions that you place on the Site can be obtained and used by\nothers. SoftChalk does not control or endorse the content, messages or information found in any\nPublic Submissions on the Site. SoftChalk specifically disclaims any responsibility or liability with\nregard to the Public Submissions and any actions resulting from your participation in any Public\nSubmissions on the Site.\n\nSoftChalk reserves the right, in its sole discretion, to remove any Public Submissions on the Site\ncontaining phone numbers, street addresses or otherwise personally identifying information as it\ncannot verify such information or confirm the desire of said information to be posted by the\nindividual to which this information pertains.\n\nRights of Third Parties\n\nYou may not submit Submissions, including forms, software, derivatives works of software or\nproperty, photos or images, that infringe in any manner on the copyright, trade-mark or intellectual\nany person or entity, or that otherwise violate the legal rights of any person or entity. You may insert\nhyperlinks in your Submissions for Users to access copyrighted material for informational purposes\n-- but, except for quotes of reasonable length, you may not post such materials in the Site itself. You\nmay not use the Site to distribute unauthorized copies of copyrighted material, including photos,\nartwork text, recordings, designs, computer programs or derivative works of such programs.\n\nYou agree not to make Submissions that contain personally identifiable information about other\npeople, such as their phone number, street address or email add",
+          "page": 7,
+          "line_start": 3,
+          "line_end": 30,
+          "confidence": 1.0
+        }
+      ],
+      "tags": []
+    },
+    {
+      "rule_id": "contract_value_within_limit",
+      "passed": true,
+      "details": "No max contract value configured; skipping.",
+      "citations": [],
+      "tags": []
+    },
+    {
+      "rule_id": "fraud_clause_present_and_assigned",
+      "passed": true,
+      "details": "Fraud clause not required by config.",
+      "citations": [],
+      "tags": []
+    },
+    {
+      "rule_id": "jurisdiction_present_and_allowed",
+      "passed": false,
+      "details": "Multiple jurisdiction clauses found: \"by, and the choice or\nforum or venue shall be in, the provincial and federal courts the State of Texas, and such courts will\nhave exclusive jurisdiction. Headings are included for convenience only, and shall not be\nconsidered in interpreting these Terms. The Terms do not limit any rights that SoftChalk may have\nunder trade secret, copyright, patent or other laws. SoftChalk reserves the right at all times to\ndisclose any information as SoftChalk deems necessary to satisfy any applicable law, regulation,\nlegal process or governmental request, or to edit, refuse to post or to remove any information or\nmaterials, in whole or in part, in SoftChalk\", \"s. Other brands, logos and marks are trade marks of their\nrespective owners.\n\nThe license shall commence upon date of payment and shall continue for the number of years\nidentified on the invoice (\", \"Governing Law. As required by Chapter\", \"for suit on or in respect of the Agreement. The\nAgreement and all of the rights and obligations of the Parties hereto and all of the terms and conditions hereof\nwill be construed, interpreted and applied in accordance with and governed by and enforced under the laws\nof the State of Texas, without regard to conflict of law provisions.\n\nb. Representations and Warranties by Contractor. If Contractor is a corporation or a limited liability company,\nContractor warrants, represents, covenants, and agrees that it is duly organized, validly existing and in good\nstanding under the laws of the state of its incorporation or organization and is duly authorized and in good\nstanding to conduct business in the State of Texas, that it has all necessary power and has received all\nnecessary approvals to execute and deliver the Agreement, and the individual executing the Agreement on\nbehalf of Contractor has been duly authorized to act for and bind Contractor.\n\nc. Tax Certification. If Contractor is a taxable entity as defined by Chapter\". One or more not in allowed list.",
+      "citations": [
+        {
+          "char_start": 40512,
+          "char_end": 41162,
+          "quote": "ld require the\napplication of law of a different jurisdiction.\n\nYou also agree that such dispute may be resolved with personal jurisdiction by, and the choice or\nforum or venue shall be in, the provincial and federal courts the State of Texas, and such courts will\nhave exclusive jurisdiction. Headings are included for convenience only, and shall not be\nconsidered in interpreting these Terms. The Terms do not limit any rights that SoftChalk may have\nunder trade secret, copyright, patent or other laws. SoftChalk reserves the right at all times to\ndisclose any information as SoftChalk deems necessary to satisfy any applicable law, regulation,\nlegal process or governmental request, or to edit, refuse to post or to remove any information or\nmaterials, in whole or in part, in SoftChalk's sole discretion.\n\nSoftChalk, and SoftChalk related brands are trade-marks of SoftChalk LLC, and may be registered\nin the United States an",
+          "page": 13,
+          "line_start": 45,
+          "line_end": 48,
+          "confidence": 1.0
+        },
+        {
+          "char_start": 41322,
+          "char_end": 41518,
+          "quote": "\nSoftChalk, and SoftChalk related brands are trade-marks of SoftChalk LLC, and may be registered\nin the United States and other jurisdictions. Other brands, logos and marks are trade marks of their\nrespective owners.\n\nThe license shall commence upon date of payment and shall continue for the number of years\nidentified on the invoice (“the Initial Term”) unless terminated earlier as set forth below. AT THE\nEND OF THE INITIAL TERM, THESE TERMS SHALL AUTOMATICALLY RENEW FOR ",
+          "page": 14,
+          "line_start": 10,
+          "line_end": 13,
+          "confidence": 1.0
+        },
+        {
+          "char_start": 44776,
+          "char_end": 44814,
+          "quote": "Contractor and\nTSTC may individually be referred to as a “Party” or collectively as “Parties” to the Agreement or this Addendum.\n\na. Venue: Governing Law. As required by Chapter 135 of the Texas Education Code, McLennan County or\nTravis County, Texas, will be the proper place of venue for suit on or in respect of the",
+          "page": 16,
+          "line_start": 6,
+          "line_end": 6,
+          "confidence": 1.0
+        },
+        {
+          "char_start": 44922,
+          "char_end": 45957,
+          "quote": "ing Law. As required by Chapter 135 of the Texas Education Code, McLennan County or\nTravis County, Texas, will be the proper place of venue for suit on or in respect of the Agreement. The\nAgreement and all of the rights and obligations of the Parties hereto and all of the terms and conditions hereof\nwill be construed, interpreted and applied in accordance with and governed by and enforced under the laws\nof the State of Texas, without regard to conflict of law provisions.\n\nb. Representations and Warranties by Contractor. If Contractor is a corporation or a limited liability company,\nContractor warrants, represents, covenants, and agrees that it is duly organized, validly existing and in good\nstanding under the laws of the state of its incorporation or organization and is duly authorized and in good\nstanding to conduct business in the State of Texas, that it has all necessary power and has received all\nnecessary approvals to execute and deliver the Agreement, and the individual executing the Agreement on\nbehalf of Contractor has been duly authorized to act for and bind Contractor.\n\nc. Tax Certification. If Contractor is a taxable entity as defined by Chapter 171, Texas Tax Code, then\nContractor certifies that it is not currently delinquent in the payment of any taxes due under such Chapter, or\nth",
+          "page": 16,
+          "line_start": 7,
+          "line_end": 19,
+          "confidence": 1.0
+        }
+      ],
+      "tags": []
+    },
+    {
+      "rule_id": "llm_explanations_status",
+      "passed": true,
+      "details": "llm_explanations=enabled (default=enabled, override=None); provider_loaded=True; explanation_error_for=liability_cap_present_and_within_bounds: AttributeError(\"'dict' object has no attribute 'strip'\"); explanation_error_for=jurisdiction_present_and_allowed: AttributeError(\"'dict' object has no attribute 'strip'\"); explanations_added=0/2",
+      "citations": [],
+      "tags": []
+    }
+  ],
+  "extraction": null,
+  "report_v2": {
+    "metadata": {
+      "file_name": "SFC - Texas_State_Technical_College_-_Quote_SoftChalk_Renewal_Team_License_(2025-2030)_&_Terms_&_Addendum_Exec_8.14.25",
+      "document_id": null,
+      "classified_type": "Employment Agreement",
+      "rulepack_id": "employment_v1",
+      "rulepack_name": "Employment Agreement",
+      "analysis_timestamp": "2025-12-04T06:45:46.123310+00:00"
+    },
+    "executive_summary": "This Employment Agreement has an overall risk level of High. Key issues include: Liability Cap Present And Within Bounds: No clear cap indicator ('12 months of fees' or explicit monetary cap) detected; Jurisdiction Present And Allowed: Multiple jurisdiction clauses found: \"by, and the choice or\nforum or venue shall be in, the provincial and federal courts the State of Texas, and such courts will\nhave exclusive jurisdiction. Headings are included for convenience only, and shall not be\nconsidered in interpreting these Terms. The Terms do not limit any rights that SoftChalk may have\nunder trade secret, copyright, patent or other laws. SoftChalk reserves the right at all times to\ndisclose any information as SoftChalk deems necessary to satisfy any applicable law, regulation,\nlegal process or governmental request, or to edit, refuse to post or to remove any information or\nmaterials, in whole or in part, in SoftChalk\", \"s. Other brands, logos and marks are trade marks of their\nrespective owners.\n\nThe license shall commence upon date of payment and shall continue for the number of years\nidentified on the invoice (\", \"Governing Law. As required by Chapter\", \"for suit on or in respect of the Agreement. The\nAgreement and all of the rights and obligations of the Parties hereto and all of the terms and conditions hereof\nwill be construed, interpreted and applied in accordance with and governed by and enforced under the laws\nof the State of Texas, without regard to conflict of law provisions.\n\nb. Representations and Warranties by Contractor. If Contractor is a corporation or a limited liability company,\nContractor warrants, represents, covenants, and agrees that it is duly organized, validly existing and in good\nstanding under the laws of the state of its incorporation or organization and is duly authorized and in good\nstanding to conduct business in the State of Texas, that it has all necessary power and has received all\nnecessary approvals to execute and deliver the Agreement, and the individual executing the Agreement on\nbehalf of Contractor has been duly authorized to act for and bind Contractor.\n\nc. Tax Certification. If Contractor is a taxable entity as defined by Chapter\". One or more not in allowed list.",
+    "preliminary_extraction": {
+      "document_type": "Employment Agreement",
+      "parties_summary": "or third parties for use consistent with the manner the Submissions will be used\nas permitted under these Terms (Employer)",
+      "duration": "Not clearly specified",
+      "fees_summary": "Contract value approximately $2,000,000.00",
+      "termination_summary": "Deliverables: for compliance (Completion Criteria)",
+      "jurisdiction": "Not specified",
+      "citations": [
+        {
+          "char_start": 0,
+          "char_end": 150,
+          "quote": "s Schedule exclude any sales tax, duties or other third-party fees andlor taxes (where\napplicable). Any taxes or fees due will be calculated and speci",
+          "page": null,
+          "line_start": null,
+          "line_end": null,
+          "confidence": 1.0
+        },
+        {
+          "char_start": 0,
+          "char_end": 150,
+          "quote": ", subject to the following conditions and to your contractual agreement\nto refrain from using any SoftChalk Cloud Content beyond the scope of this lic",
+          "page": null,
+          "line_start": null,
+          "line_end": null,
+          "confidence": 1.0
+        },
+        {
+          "char_start": 0,
+          "char_end": 150,
+          "quote": "e construed to prevent or restrict TSTC from full compliance with\nsuch Act.\n\nh. Eligibility Certification. To the extent applicable, pursuant to Secti",
+          "page": null,
+          "line_start": null,
+          "line_end": null,
+          "confidence": 1.0
+        }
+      ]
+    },
+    "compliance_checks": [
+      {
+        "check_id": "liability_cap_present_and_within_bounds",
+        "label": "Liability Cap Present And Within Bounds",
+        "status": "FAIL",
+        "severity": "High",
+        "message": "No clear cap indicator ('12 months of fees' or explicit monetary cap) detected.",
+        "citations": [
+          {
+            "char_start": 17442,
+            "char_end": 19251,
+            "quote": "efuse to post and can remove any information or materials, in whole or in\npart, that it, at its sole discretion, deems to be offensive, indecent, or otherwise\ninappropriate regardless of whether such material or its dissemination is unlawful.\n\nSubmissions—Privacy Safeguards\n\nWhile SoftChalk strives to maintain your privacy (see our Privacy Policy), you should always use\ncaution when giving out any personally identifiable information about yourself in any Public\nSubmissions. Any Public Submissions that you place on the Site can be obtained and used by\nothers. SoftChalk does not control or endorse the content, messages or information found in any\nPublic Submissions on the Site. SoftChalk specifically disclaims any responsibility or liability with\nregard to the Public Submissions and any actions resulting from your participation in any Public\nSubmissions on the Site.\n\nSoftChalk reserves the right, in its sole discretion, to remove any Public Submissions on the Site\ncontaining phone numbers, street addresses or otherwise personally identifying information as it\ncannot verify such information or confirm the desire of said information to be posted by the\nindividual to which this information pertains.\n\nRights of Third Parties\n\nYou may not submit Submissions, including forms, software, derivatives works of software or\nproperty, photos or images, that infringe in any manner on the copyright, trade-mark or intellectual\nany person or entity, or that otherwise violate the legal rights of any person or entity. You may insert\nhyperlinks in your Submissions for Users to access copyrighted material for informational purposes\n-- but, except for quotes of reasonable length, you may not post such materials in the Site itself. You\nmay not use the Site to distribute unauthorized copies of copyrighted material, including photos,\nartwork text, recordings, designs, computer programs or derivative works of such programs.\n\nYou agree not to make Submissions that contain personally identifiable information about other\npeople, such as their phone number, street address or email add",
+            "page": 7,
+            "line_start": 3,
+            "line_end": 30,
+            "confidence": 1.0
+          }
+        ],
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "check_id": "contract_value_within_limit",
+        "label": "Contract Value Within Limit",
+        "status": "PASS",
+        "severity": "Medium",
+        "message": "No max contract value configured; skipping.",
+        "citations": [],
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "check_id": "fraud_clause_present_and_assigned",
+        "label": "Fraud Clause Present And Assigned",
+        "status": "PASS",
+        "severity": "High",
+        "message": "Fraud clause not required by config.",
+        "citations": [],
+        "reason_short": null,
+        "reason_detailed": null
+      },
+      {
+        "check_id": "jurisdiction_present_and_allowed",
+        "label": "Jurisdiction Present And Allowed",
+        "status": "FAIL",
+        "severity": "High",
+        "message": "Multiple jurisdiction clauses found: \"by, and the choice or\nforum or venue shall be in, the provincial and federal courts the State of Texas, and such courts will\nhave exclusive jurisdiction. Headings are included for convenience only, and shall not be\nconsidered in interpreting these Terms. The Terms do not limit any rights that SoftChalk may have\nunder trade secret, copyright, patent or other laws. SoftChalk reserves the right at all times to\ndisclose any information as SoftChalk deems necessary to satisfy any applicable law, regulation,\nlegal process or governmental request, or to edit, refuse to post or to remove any information or\nmaterials, in whole or in part, in SoftChalk\", \"s. Other brands, logos and marks are trade marks of their\nrespective owners.\n\nThe license shall commence upon date of payment and shall continue for the number of years\nidentified on the invoice (\", \"Governing Law. As required by Chapter\", \"for suit on or in respect of the Agreement. The\nAgreement and all of the rights and obligations of the Parties hereto and all of the terms and conditions hereof\nwill be construed, interpreted and applied in accordance with and governed by and enforced under the laws\nof the State of Texas, without regard to conflict of law provisions.\n\nb. Representations and Warranties by Contractor. If Contractor is a corporation or a limited liability company,\nContractor warrants, represents, covenants, and agrees that it is duly organized, validly existing and in good\nstanding under the laws of the state of its incorporation or organization and is duly authorized and in good\nstanding to conduct business in the State of Texas, that it has all necessary power and has received all\nnecessary approvals to execute and deliver the Agreement, and the individual executing the Agreement on\nbehalf of Contractor has been duly authorized to act for and bind Contractor.\n\nc. Tax Certification. If Contractor is a taxable entity as defined by Chapter\". One or more not in allowed list.",
+        "citations": [
+          {
+            "char_start": 40512,
+            "char_end": 41162,
+            "quote": "ld require the\napplication of law of a different jurisdiction.\n\nYou also agree that such dispute may be resolved with personal jurisdiction by, and the choice or\nforum or venue shall be in, the provincial and federal courts the State of Texas, and such courts will\nhave exclusive jurisdiction. Headings are included for convenience only, and shall not be\nconsidered in interpreting these Terms. The Terms do not limit any rights that SoftChalk may have\nunder trade secret, copyright, patent or other laws. SoftChalk reserves the right at all times to\ndisclose any information as SoftChalk deems necessary to satisfy any applicable law, regulation,\nlegal process or governmental request, or to edit, refuse to post or to remove any information or\nmaterials, in whole or in part, in SoftChalk's sole discretion.\n\nSoftChalk, and SoftChalk related brands are trade-marks of SoftChalk LLC, and may be registered\nin the United States an",
+            "page": 13,
+            "line_start": 45,
+            "line_end": 48,
+            "confidence": 1.0
+          },
+          {
+            "char_start": 41322,
+            "char_end": 41518,
+            "quote": "\nSoftChalk, and SoftChalk related brands are trade-marks of SoftChalk LLC, and may be registered\nin the United States and other jurisdictions. Other brands, logos and marks are trade marks of their\nrespective owners.\n\nThe license shall commence upon date of payment and shall continue for the number of years\nidentified on the invoice (“the Initial Term”) unless terminated earlier as set forth below. AT THE\nEND OF THE INITIAL TERM, THESE TERMS SHALL AUTOMATICALLY RENEW FOR ",
+            "page": 14,
+            "line_start": 10,
+            "line_end": 13,
+            "confidence": 1.0
+          },
+          {
+            "char_start": 44776,
+            "char_end": 44814,
+            "quote": "Contractor and\nTSTC may individually be referred to as a “Party” or collectively as “Parties” to the Agreement or this Addendum.\n\na. Venue: Governing Law. As required by Chapter 135 of the Texas Education Code, McLennan County or\nTravis County, Texas, will be the proper place of venue for suit on or in respect of the",
+            "page": 16,
+            "line_start": 6,
+            "line_end": 6,
+            "confidence": 1.0
+          },
+          {
+            "char_start": 44922,
+            "char_end": 45957,
+            "quote": "ing Law. As required by Chapter 135 of the Texas Education Code, McLennan County or\nTravis County, Texas, will be the proper place of venue for suit on or in respect of the Agreement. The\nAgreement and all of the rights and obligations of the Parties hereto and all of the terms and conditions hereof\nwill be construed, interpreted and applied in accordance with and governed by and enforced under the laws\nof the State of Texas, without regard to conflict of law provisions.\n\nb. Representations and Warranties by Contractor. If Contractor is a corporation or a limited liability company,\nContractor warrants, represents, covenants, and agrees that it is duly organized, validly existing and in good\nstanding under the laws of the state of its incorporation or organization and is duly authorized and in good\nstanding to conduct business in the State of Texas, that it has all necessary power and has received all\nnecessary approvals to execute and deliver the Agreement, and the individual executing the Agreement on\nbehalf of Contractor has been duly authorized to act for and bind Contractor.\n\nc. Tax Certification. If Contractor is a taxable entity as defined by Chapter 171, Texas Tax Code, then\nContractor certifies that it is not currently delinquent in the payment of any taxes due under such Chapter, or\nth",
+            "page": 16,
+            "line_start": 7,
+            "line_end": 19,
+            "confidence": 1.0
+          }
+        ],
+        "reason_short": null,
+        "reason_detailed": null
+      }
+    ],
+    "rulepack_summary": {
+      "rulepack_id": "employment_v1",
+      "rulepack_name": "Employment Agreement",
+      "total_rules": 0,
+      "pass_count": 0,
+      "fail_count": 0,
+      "warn_count": 0,
+      "info_count": 0
+    },
+    "rulepack_rules": [],
+    "extracted_key_terms": null,
+    "risk_assessment": {
+      "overall_risk_level": "High",
+      "top_risks": [
+        "Liability Cap Present And Within Bounds: No clear cap indicator ('12 months of fees' or explicit monetary cap) detected",
+        "Jurisdiction Present And Allowed: Multiple jurisdiction clauses found: \"by, and the choice or\nforum or venue shall be in, the provincial and federal courts the State of Texas, and such courts will\nhave exclusive jurisdiction. Headings are included for convenience only, and shall not be\nconsidered in interpreting these Terms. The Terms do not limit any rights that SoftChalk may have\nunder trade secret, copyright, patent or other laws. SoftChalk reserves the right at all times to\ndisclose any information as SoftChalk deems necessary to satisfy any applicable law, regulation,\nlegal process or governmental request, or to edit, refuse to post or to remove any information or\nmaterials, in whole or in part, in SoftChalk\", \"s. Other brands, logos and marks are trade marks of their\nrespective owners.\n\nThe license shall commence upon date of payment and shall continue for the number of years\nidentified on the invoice (\", \"Governing Law. As required by Chapter\", \"for suit on or in respect of the Agreement. The\nAgreement and all of the rights and obligations of the Parties hereto and all of the terms and conditions hereof\nwill be construed, interpreted and applied in accordance with and governed by and enforced under the laws\nof the State of Texas, without regard to conflict of law provisions.\n\nb. Representations and Warranties by Contractor. If Contractor is a corporation or a limited liability company,\nContractor warrants, represents, covenants, and agrees that it is duly organized, validly existing and in good\nstanding under the laws of the state of its incorporation or organization and is duly authorized and in good\nstanding to conduct business in the State of Texas, that it has all necessary power and has received all\nnecessary approvals to execute and deliver the Agreement, and the individual executing the Agreement on\nbehalf of Contractor has been duly authorized to act for and bind Contractor.\n\nc. Tax Certification. If Contractor is a taxable entity as defined by Chapter\". One or more not in allowed list"
+      ],
+      "recommendations": [
+        "Review the failed checks above and consider renegotiating or seeking legal review."
+      ],
+      "recommendations_per_check": {
+        "liability_cap_present_and_within_bounds": "Add a clear liability cap indicator (e.g., '12 months of fees' or an explicit monetary cap) to the contract. This can be done by inserting a sentence such as: 'The total liability under this agreement shall not exceed [insert specific amount or duration].'",
+        "jurisdiction_present_and_allowed": "Remove the multiple jurisdiction clauses and replace them with a single, clear clause that specifies the applicable jurisdiction (e.g., 'This agreement shall be governed by and construed in accordance with the laws of the State of Texas')."
+      },
+      "risk_calculation_method": "Hybrid"
+    },
+    "citation_map": {},
+    "passed_all": false
+  }
+}

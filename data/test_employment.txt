@@ -1,0 +1,35 @@
+EMPLOYMENT AGREEMENT
+
+This Employment Agreement ("Agreement") is entered into as of October 9, 2025, between TechCorp Inc. ("Company") and Jane Smith ("Employee").
+
+1. POSITION AND DUTIES
+Employee shall serve as Senior Software Engineer and shall perform such duties as assigned by the Company.
+
+2. COMPENSATION
+Employee shall receive an annual salary of $180,000, payable in accordance with Company's standard payroll practices.
+
+3. GOVERNING LAW
+This Agreement shall be governed by and construed in accordance with the laws of the State of California.
+
+4. TERMINATION
+Either party may terminate this Agreement with 45 days written notice to the other party.
+
+5. CONFIDENTIALITY
+Employee agrees to maintain confidentiality of all proprietary information.
+
+6. INTELLECTUAL PROPERTY
+All inventions, discoveries, and improvements made by Employee during employment shall be the sole property of the Company. Employee hereby assigns all rights to such work to the Company.
+
+7. LIABILITY
+The Company's total liability under this Agreement shall not exceed two times the annual compensation specified in Section 2.
+
+8. ENTIRE AGREEMENT
+This Agreement constitutes the entire agreement between the parties and supersedes all prior agreements.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.
+
+TechCorp Inc.
+By: John Doe, CEO
+
+Jane Smith
+Employee
